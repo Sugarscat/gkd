@@ -136,6 +136,7 @@ class App : Application() {
             initSubsState()
             initChannel()
             clearHttpSubs()
+            updatePermissionState()
         }
     }
 }

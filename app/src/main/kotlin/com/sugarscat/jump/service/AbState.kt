@@ -173,7 +173,7 @@ fun updateLauncherAppId() {
 val clickLogMutex by lazy { Mutex() }
 suspend fun insertClickLog(rule: ResolvedRule) {
     clickLogMutex.withLock {
-        increaseClickCount()
+        actionCountFlow.value++
         val clickLog = ClickLog(
             appId = topActivityFlow.value.appId,
             activityId = topActivityFlow.value.activityId,
@@ -188,7 +188,7 @@ suspend fun insertClickLog(rule: ResolvedRule) {
             ruleKey = rule.key,
         )
         DbSet.clickLogDao.insert(clickLog)
-        if (recordStoreFlow.value.clickCount % 100 == 0) {
+        if (actionCountFlow.value % 100 == 0L) {
             DbSet.clickLogDao.deleteKeepLatest()
         }
     }

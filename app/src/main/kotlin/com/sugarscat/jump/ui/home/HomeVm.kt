@@ -59,7 +59,7 @@ class HomeVm : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val subsStatusFlow by lazy {
-        combine(ruleSummaryFlow, clickCountFlow) { ruleSummary, count ->
+        combine(ruleSummaryFlow, actionCountFlow) { ruleSummary, count ->
             getSubsStatus(ruleSummary, count)
         }.stateIn(com.sugarscat.jump.appScope, SharingStarted.Eagerly, "")
     }

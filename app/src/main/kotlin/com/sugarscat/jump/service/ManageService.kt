@@ -30,7 +30,7 @@ class ManageService : CompositionService({
             JumpAbService.isRunning,
             storeFlow,
             ruleSummaryFlow,
-            clickCountFlow,
+            actionCountFlow,
         ) { abRunning, store, ruleSummary, count ->
             if (!abRunning) return@combine "无障碍未授权"
             if (!store.enableMatch) return@combine "暂停规则匹配"
