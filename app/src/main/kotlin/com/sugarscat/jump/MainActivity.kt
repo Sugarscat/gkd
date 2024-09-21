@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             storeFlow.map(lifecycleScope) { s -> s.excludeFromRecents }.collect {
-                (com.sugarscat.jump.app.getSystemService(ACTIVITY_SERVICE) as ActivityManager).let { manager ->
+                (app.getSystemService(ACTIVITY_SERVICE) as ActivityManager).let { manager ->
                     manager.appTasks.forEach { task ->
                         task?.setExcludeFromRecents(it)
                     }
@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
                     ShizukuErrorDialog(mainVm.shizukuErrorFlow)
                     AuthDialog(mainVm.authReasonFlow)
                     BuildDialog(mainVm.dialogFlow)
-                    if (com.sugarscat.jump.META.updateEnabled) {
+                    if (META.updateEnabled) {
                         UpgradeDialog(mainVm.updateStatus)
                     }
                 }
@@ -104,22 +104,22 @@ class MainActivity : ComponentActivity() {
         super.onResume()
 
         // 每次切换页面更新记录桌面 appId
-        com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
+        appScope.launchTry(Dispatchers.IO) {
             updateLauncherAppId()
         }
 
         // 在某些机型由于未知原因创建失败, 在此保证每次界面切换都能重新检测创建
-        com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
+        appScope.launchTry(Dispatchers.IO) {
             initFolder()
         }
 
         // 用户在系统权限设置中切换权限后再切换回应用时能及时更新状态
-        com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
+        appScope.launchTry(Dispatchers.IO) {
             updatePermissionState()
         }
 
         // 由于某些机型的进程存在 安装缓存/崩溃缓存 导致服务状态可能不正确, 在此保证每次界面切换都能重新刷新状态
-        com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
+        appScope.launchTry(Dispatchers.IO) {
             updateServiceRunning()
         }
     }
@@ -216,14 +216,14 @@ private fun ShizukuErrorDialog(stateFlow: MutableStateFlow<Boolean>) {
                 if (installed) {
                     TextButton(onClick = {
                         stateFlow.value = false
-                        com.sugarscat.jump.app.openApp(appId)
+                        app.openApp(appId)
                     }) {
                         Text(text = "打开 Shizuku")
                     }
                 } else {
                     TextButton(onClick = {
                         stateFlow.value = false
-                        com.sugarscat.jump.app.openUri("https://shizuku.rikka.app/")
+                        app.openUri("https://shizuku.rikka.app/")
                     }) {
                         Text(text = "去下载")
                     }

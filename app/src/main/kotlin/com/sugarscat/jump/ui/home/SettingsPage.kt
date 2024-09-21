@@ -39,7 +39,6 @@ import com.ramcosta.composedestinations.generated.destinations.AboutPageDestinat
 import com.ramcosta.composedestinations.generated.destinations.AdvancedPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
 import kotlinx.coroutines.flow.update
-import com.sugarscat.jump.META
 import com.sugarscat.jump.MainActivity
 import com.sugarscat.jump.ui.component.RotatingLoadingIcon
 import com.sugarscat.jump.ui.component.SettingItem
@@ -128,7 +127,7 @@ fun useSettingsPage(): ScaffoldExt {
     }
     if (showNotifTextInputDlg) {
         var value by remember {
-            mutableStateOf(store.customNotifText)
+            mutableStateOf(store.customNotIfText)
         }
         val maxCharLen = 64
         AlertDialog(title = {
@@ -174,7 +173,7 @@ fun useSettingsPage(): ScaffoldExt {
             }
         }, confirmButton = {
             TextButton(enabled = value.isNotEmpty(), onClick = {
-                storeFlow.update { it.copy(customNotifText = value) }
+                storeFlow.update { it.copy(customNotIfText = value) }
                 showNotifTextInputDlg = false
             }) {
                 Text(
@@ -251,14 +250,14 @@ fun useSettingsPage(): ScaffoldExt {
             val subsStatus by vm.subsStatusFlow.collectAsState()
             TextSwitch(
                 title = "通知文案",
-                subtitle = if (store.useCustomNotifText) store.customNotifText else subsStatus,
-                checked = store.useCustomNotifText,
+                subtitle = if (store.useCustomNotIfText) store.customNotIfText else subsStatus,
+                checked = store.useCustomNotIfText,
                 modifier = Modifier.clickable {
                     showNotifTextInputDlg = true
                 },
                 onCheckedChange = {
                     storeFlow.value = store.copy(
-                        useCustomNotifText = it
+                        useCustomNotIfText = it
                     )
                 })
 

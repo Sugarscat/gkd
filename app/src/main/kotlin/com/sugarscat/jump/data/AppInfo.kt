@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import com.sugarscat.jump.app
 
 @Serializable
 data class AppInfo(
@@ -17,7 +16,7 @@ data class AppInfo(
     val versionCode: Long,
     val versionName: String?,
     val isSystem: Boolean,
-    val mtime: Long,
+    val time: Long,
     val hidden: Boolean,
 )
 
@@ -42,7 +41,7 @@ fun PackageInfo.toAppInfo(): AppInfo? {
         },
         versionName = versionName,
         isSystem = (ApplicationInfo.FLAG_SYSTEM and applicationInfo.flags) != 0,
-        mtime = lastUpdateTime,
+        time = lastUpdateTime,
         hidden = com.sugarscat.jump.app.packageManager.getLaunchIntentForPackage(packageName) == null
     )
 }

@@ -115,9 +115,9 @@ android {
         debug {
             versionNameSuffix = vnSuffix
             applicationIdSuffix = ".debug"
-            resValue("string", "app_name", "JUMP-debug")
+            resValue("string", "app_name", "Jump-debug")
             resValue("string", "capture_label", "捕获快照-debug")
-            resValue("string", "import_desc", "JUMP-debug-导入数据")
+            resValue("string", "import_desc", "导入数据-debug")
         }
     }
     productFlavors {

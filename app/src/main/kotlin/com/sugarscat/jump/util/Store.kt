@@ -1,6 +1,7 @@
 package com.sugarscat.jump.util
 
 import com.blankj.utilcode.util.LogUtils
+import com.sugarscat.jump.appScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
@@ -8,8 +9,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import com.sugarscat.jump.META
-import com.sugarscat.jump.appScope
 
 private inline fun <reified T> createJsonFlow(
     key: String,
@@ -65,7 +64,7 @@ data class Store(
     val captureVolumeChange: Boolean = false,
     val autoCheckAppUpdate: Boolean = com.sugarscat.jump.META.updateEnabled,
     val toastWhenClick: Boolean = true,
-    val clickToast: String = "JUMP",
+    val clickToast: String = "Jump",
     val autoClearMemorySubs: Boolean = true,
     val hideSnapshotStatusBar: Boolean = false,
     val enableShizukuActivity: Boolean = false,
@@ -79,8 +78,8 @@ data class Store(
     val showHiddenApp: Boolean = false,
     val showSaveSnapshotToast: Boolean = true,
     val useSystemToast: Boolean = false,
-    val useCustomNotifText: Boolean = false,
-    val customNotifText: String = "\${i}全局/\${k}应用/\${u}规则组/\${n}触发",
+    val useCustomNotIfText: Boolean = false,
+    val customNotIfText: String = "\${i}全局/\${k}应用/\${u}规则组/\${n}触发",
     val enableActivityLog: Boolean = false,
     val updateChannel: Int = if (com.sugarscat.jump.META.versionName.contains("beta")) UpdateChannelOption.Beta.value else UpdateChannelOption.Stable.value,
 )

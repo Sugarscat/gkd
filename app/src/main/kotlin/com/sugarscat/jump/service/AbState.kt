@@ -1,13 +1,6 @@
 package com.sugarscat.jump.service
 
 import com.blankj.utilcode.util.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import com.sugarscat.jump.META
-import com.sugarscat.jump.app
-import com.sugarscat.jump.appScope
 import com.sugarscat.jump.data.ActivityLog
 import com.sugarscat.jump.data.AppRule
 import com.sugarscat.jump.data.ClickLog
@@ -17,15 +10,18 @@ import com.sugarscat.jump.data.SubsConfig
 import com.sugarscat.jump.db.DbSet
 import com.sugarscat.jump.isActivityVisible
 import com.sugarscat.jump.util.RuleSummary
+import com.sugarscat.jump.util.actionCountFlow
 import com.sugarscat.jump.util.getDefaultLauncherAppId
-import com.sugarscat.jump.util.increaseClickCount
 import com.sugarscat.jump.util.launchTry
-import com.sugarscat.jump.util.recordStoreFlow
 import com.sugarscat.jump.util.ruleSummaryFlow
 import com.sugarscat.jump.util.storeFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 data class TopActivity(
-    val appId: String = "",
+    val appId: String = "com.sugarscat.jump",
     val activityId: String? = null,
     val number: Int = 0
 ) {

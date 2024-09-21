@@ -7,14 +7,14 @@ import com.sugarscat.jump.app
 import java.io.File
 
 private val filesDir by lazy {
-    com.sugarscat.jump.app.getExternalFilesDir(null) ?: com.sugarscat.jump.app.filesDir
+    app.getExternalFilesDir(null) ?: com.sugarscat.jump.app.filesDir
 }
 val dbFolder by lazy { filesDir.resolve("db") }
 val subsFolder by lazy { filesDir.resolve("subscription") }
 val snapshotFolder by lazy { filesDir.resolve("snapshot") }
 
 private val cacheDir by lazy {
-    com.sugarscat.jump.app.externalCacheDir ?: com.sugarscat.jump.app.cacheDir
+    app.externalCacheDir ?: app.cacheDir
 }
 val snapshotZipDir by lazy { cacheDir.resolve("snapshotZip") }
 val newVersionApkDir by lazy { cacheDir.resolve("newVersionApk") }

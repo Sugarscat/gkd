@@ -68,7 +68,7 @@ class MainViewModel : ViewModel() {
             clearCache()
         }
 
-        if (com.sugarscat.jump.META.updateEnabled && storeFlow.value.autoCheckAppUpdate) {
+        if (META.updateEnabled && storeFlow.value.autoCheckAppUpdate) {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     updateStatus.checkUpdate()

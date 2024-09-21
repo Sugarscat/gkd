@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import com.sugarscat.jump.data.selfAppInfo
 import com.sugarscat.jump.debug.clearHttpSubs
 import com.sugarscat.jump.notif.initChannel
+import com.sugarscat.jump.permission.updatePermissionState
 import com.sugarscat.jump.service.JumpAbService
 import com.sugarscat.jump.util.SafeR
 import com.sugarscat.jump.util.initAppState
@@ -36,26 +37,26 @@ val appScope by lazy { MainScope() }
 
 private lateinit var innerApp: Application
 val app: Application
-    get() = com.sugarscat.jump.innerApp
+    get() = innerApp
 
 val applicationInfo by lazy {
-    com.sugarscat.jump.app.packageManager.getApplicationInfo(
-        com.sugarscat.jump.app.packageName,
+    app.packageManager.getApplicationInfo(
+        app.packageName,
         PackageManager.GET_META_DATA
     )
 }
 
 data object META {
-    val channel by lazy { com.sugarscat.jump.applicationInfo.metaData.getString("channel")!! }
-    val commitId by lazy { com.sugarscat.jump.applicationInfo.metaData.getString("commitId")!! }
-    val commitUrl by lazy { "https://github.com/sugarscat/jump/commit/${com.sugarscat.jump.META.commitId}" }
-    val commitTime by lazy { com.sugarscat.jump.applicationInfo.metaData.getLong("commitTime") }
-    val updateEnabled by lazy { com.sugarscat.jump.applicationInfo.metaData.getBoolean("updateEnabled") }
-    val debuggable by lazy { com.sugarscat.jump.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0 }
+    val channel by lazy { applicationInfo.metaData.getString("channel")!! }
+    val commitId by lazy { applicationInfo.metaData.getString("commitId")!! }
+    val commitUrl by lazy { "https://github.com/sugarscat/jump/commit/$commitId" }
+    val commitTime by lazy { applicationInfo.metaData.getLong("commitTime") }
+    val updateEnabled by lazy { applicationInfo.metaData.getBoolean("updateEnabled") }
+    val debuggable by lazy { applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0 }
     val versionCode by lazy { selfAppInfo.versionCode.toInt() }
     val versionName by lazy { selfAppInfo.versionName!! }
     val appId by lazy { selfAppInfo.id }
-    val appName by lazy { com.sugarscat.jump.app.getString(SafeR.app_name) }
+    val appName by lazy { app.getString(SafeR.app_name) }
 }
 
 class App : Application() {
@@ -68,7 +69,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        com.sugarscat.jump.innerApp = this
+        innerApp = this
         Utils.init(this)
 
         val errorHandler = Thread.getDefaultUncaughtExceptionHandler()
@@ -82,12 +83,12 @@ class App : Application() {
         setReactiveToastStyle()
 
         LogUtils.getConfig().apply {
-            setConsoleSwitch(com.sugarscat.jump.META.debuggable)
+            setConsoleSwitch(META.debuggable)
             saveDays = 7
             isLog2FileSwitch = true
         }
         LogUtils.d(
-            "META", com.sugarscat.jump.META
+            "META", META
         )
         initFolder()
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
@@ -119,18 +120,18 @@ class App : Application() {
                 LogUtils.d("onActivityDestroyed", activity)
             }
         })
-        com.sugarscat.jump.app.contentResolver.registerContentObserver(
+        app.contentResolver.registerContentObserver(
             Settings.Secure.getUriFor(Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES),
             false,
             object : ContentObserver(null) {
                 override fun onChange(selfChange: Boolean) {
                     super.onChange(selfChange)
-                    com.sugarscat.jump.a11yServiceEnabledFlow.value =
-                        com.sugarscat.jump.getA11yServiceEnabled()
+                    a11yServiceEnabledFlow.value =
+                        getA11yServiceEnabled()
                 }
             }
         )
-        com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
+        appScope.launchTry(Dispatchers.IO) {
             initStore()
             initAppState()
             initSubsState()
@@ -141,11 +142,11 @@ class App : Application() {
     }
 }
 
-val a11yServiceEnabledFlow by lazy { MutableStateFlow(com.sugarscat.jump.getA11yServiceEnabled()) }
+val a11yServiceEnabledFlow by lazy { MutableStateFlow(getA11yServiceEnabled()) }
 private fun getA11yServiceEnabled(): Boolean {
     val value = try {
         Settings.Secure.getString(
-            com.sugarscat.jump.app.contentResolver,
+            app.contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         )
     } catch (_: Exception) {
@@ -154,7 +155,7 @@ private fun getA11yServiceEnabled(): Boolean {
     if (value.isNullOrEmpty()) return false
     val colonSplitter = TextUtils.SimpleStringSplitter(':')
     colonSplitter.setString(value)
-    val name = ComponentName(com.sugarscat.jump.app, JumpAbService::class.java)
+    val name = ComponentName(app, JumpAbService::class.java)
     while (colonSplitter.hasNext()) {
         if (ComponentName.unflattenFromString(colonSplitter.next()) == name) {
             return true

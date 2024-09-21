@@ -3,22 +3,22 @@ package com.sugarscat.jump.service
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import com.sugarscat.jump.composition.CompositionExt.useLifeCycleLog
 import com.sugarscat.jump.composition.CompositionExt.useScope
 import com.sugarscat.jump.composition.CompositionService
 import com.sugarscat.jump.notif.abNotif
 import com.sugarscat.jump.notif.createNotif
 import com.sugarscat.jump.notif.defaultChannel
-import com.sugarscat.jump.util.clickCountFlow
+import com.sugarscat.jump.util.actionCountFlow
 import com.sugarscat.jump.util.getSubsStatus
 import com.sugarscat.jump.util.ruleSummaryFlow
 import com.sugarscat.jump.util.storeFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class ManageService : CompositionService({
     useLifeCycleLog()
@@ -34,8 +34,8 @@ class ManageService : CompositionService({
         ) { abRunning, store, ruleSummary, count ->
             if (!abRunning) return@combine "无障碍未授权"
             if (!store.enableMatch) return@combine "暂停规则匹配"
-            if (store.useCustomNotifText) {
-                return@combine store.customNotifText
+            if (store.useCustomNotIfText) {
+                return@combine store.customNotIfText
                     .replace("\${i}", ruleSummary.globalGroups.size.toString())
                     .replace("\${k}", ruleSummary.appSize.toString())
                     .replace("\${u}", ruleSummary.appGroupSize.toString())

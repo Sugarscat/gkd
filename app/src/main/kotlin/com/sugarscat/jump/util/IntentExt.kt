@@ -11,12 +11,11 @@ import android.provider.Settings
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import com.blankj.utilcode.util.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.sugarscat.jump.MainActivity
-import com.sugarscat.jump.app
 import com.sugarscat.jump.permission.canWriteExternalStorage
 import com.sugarscat.jump.permission.requiredPermission
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 fun Context.shareFile(file: File, title: String) {

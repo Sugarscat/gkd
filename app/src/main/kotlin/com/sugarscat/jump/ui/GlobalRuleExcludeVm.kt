@@ -59,7 +59,7 @@ class GlobalRuleExcludeVm (stateHandle: SavedStateHandle) : ViewModel() {
         }, sortTypeFlow, appIdToOrderFlow) { apps, sortType, appIdToOrder ->
             when (sortType) {
                 SortTypeOption.SortByAppMtime -> {
-                    apps.sortedBy { a -> -a.mtime }
+                    apps.sortedBy { a -> -a.time }
                 }
 
                 SortTypeOption.SortByTriggerTime -> {

@@ -3,23 +3,14 @@ package com.sugarscat.jump.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.LogUtils
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import com.sugarscat.jump.appScope
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsItem
 import com.sugarscat.jump.db.DbSet
 import com.sugarscat.jump.ui.component.InputSubsLinkOption
 import com.sugarscat.jump.util.SortTypeOption
+import com.sugarscat.jump.util.actionCountFlow
 import com.sugarscat.jump.util.appInfoCacheFlow
-import com.sugarscat.jump.util.clickCountFlow
 import com.sugarscat.jump.util.client
 import com.sugarscat.jump.util.getSubsStatus
 import com.sugarscat.jump.util.launchTry
@@ -32,6 +23,15 @@ import com.sugarscat.jump.util.subsItemsFlow
 import com.sugarscat.jump.util.subsRefreshingFlow
 import com.sugarscat.jump.util.toast
 import com.sugarscat.jump.util.updateSubscription
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 class HomeVm : ViewModel() {
 
@@ -61,7 +61,7 @@ class HomeVm : ViewModel() {
     val subsStatusFlow by lazy {
         combine(ruleSummaryFlow, actionCountFlow) { ruleSummary, count ->
             getSubsStatus(ruleSummary, count)
-        }.stateIn(com.sugarscat.jump.appScope, SharingStarted.Eagerly, "")
+        }.stateIn(appScope, SharingStarted.Eagerly, "")
     }
 
     fun addOrModifySubs(
@@ -149,7 +149,7 @@ class HomeVm : ViewModel() {
         }, sortTypeFlow, appIdToOrderFlow) { appInfos, sortType, appIdToOrder ->
             when (sortType) {
                 SortTypeOption.SortByAppMtime -> {
-                    appInfos.sortedBy { a -> -a.mtime }
+                    appInfos.sortedBy { a -> -a.time }
                 }
 
                 SortTypeOption.SortByTriggerTime -> {

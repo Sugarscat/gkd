@@ -68,7 +68,7 @@ class SubsVm (stateHandle: SavedStateHandle) : ViewModel() {
         ) { apps, appInfoCache, appIdToOrder, sortType ->
             when (sortType) {
                 SortTypeOption.SortByAppMtime -> {
-                    apps.sortedBy { a -> -(appInfoCache[a.id]?.mtime ?: 0) }
+                    apps.sortedBy { a -> -(appInfoCache[a.id]?.time ?: 0) }
                 }
 
                 SortTypeOption.SortByTriggerTime -> {
