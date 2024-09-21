@@ -13,8 +13,8 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '17'
+          distribution: "adopt"
+          java-version: "17"
 
       - uses: gradle/actions/setup-gradle@v3
         with:
@@ -23,11 +23,11 @@ jobs:
 
       - name: write secrets info
         run: |
-          echo ${{ secrets.GKD_STORE_FILE_BASE64 }} | base64 --decode > ${{ github.workspace }}/key.jks
-          echo GKD_STORE_FILE='${{ github.workspace }}/key.jks' >> gradle.properties
-          echo GKD_STORE_PASSWORD='${{ secrets.GKD_STORE_PASSWORD }}' >> gradle.properties
-          echo GKD_KEY_ALIAS='${{ secrets.GKD_KEY_ALIAS }}' >> gradle.properties
-          echo GKD_KEY_PASSWORD='${{ secrets.GKD_KEY_PASSWORD }}' >> gradle.properties
+          echo ${{ secrets.JUMP_STORE_FILE_BASE64 }} | base64 --decode > ${{ github.workspace }}/key.jks
+          echo JUMP_STORE_FILE='${{ github.workspace }}/key.jks' >> gradle.properties
+          echo JUMP_STORE_PASSWORD='${{ secrets.JUMP_STORE_PASSWORD }}' >> gradle.properties
+          echo JUMP_KEY_ALIAS='${{ secrets.JUMP_KEY_ALIAS }}' >> gradle.properties
+          echo JUMP_KEY_PASSWORD='${{ secrets.JUMP_KEY_PASSWORD }}' >> gradle.properties
 
       - run: chmod 777 ./gradlew
       - run: ./gradlew app:assembleRelease

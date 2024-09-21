@@ -9,5 +9,5 @@
     android:canTakeScreenshot="true"
     android:description="@string/ab_desc"
     android:notificationTimeout="100"
-    android:settingsActivity="li.songe.gkd.MainActivity"
+    android:settingsActivity="com.sugarscat.jump.MainActivity"
     tools:ignore="UnusedAttribute" />

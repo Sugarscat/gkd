@@ -1,4 +1,4 @@
-rootProject.name = "gkd"
+rootProject.name = "jump"
 include(":app")
 include(":selector")
 include(":hidden_api")

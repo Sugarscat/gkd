@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "li.songe.gkd"
+    namespace = "com.sugarscat.jump"
     compileSdk = project.properties["android_compileSdk"].toString().toInt()
     buildToolsVersion = project.properties["android_buildToolsVersion"].toString()
 

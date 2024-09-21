@@ -49,15 +49,16 @@ plugins {
 }
 
 android {
-    namespace = "li.songe.gkd"
+    namespace = "com.sugarscat.jump"
     compileSdk = project.properties["android_compileSdk"].toString().toInt()
     buildToolsVersion = project.properties["android_buildToolsVersion"].toString()
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         minSdk = project.properties["android_minSdk"].toString().toInt()
         targetSdk = project.properties["android_targetSdk"].toString().toInt()
 
-        applicationId = "li.songe.gkd"
+        applicationId = "com.sugarscat.jump"
         versionCode = 42
         versionName = "1.8.0"
 
@@ -82,12 +83,12 @@ android {
         aidl = true
     }
 
-    val currentSigning = if (project.hasProperty("GKD_STORE_FILE")) {
+    val currentSigning = if (project.hasProperty("JUMP_STORE_FILE")) {
         signingConfigs.create("release") {
-            storeFile = file(project.properties["GKD_STORE_FILE"] as String)
-            storePassword = project.properties["GKD_STORE_PASSWORD"] as String
-            keyAlias = project.properties["GKD_KEY_ALIAS"] as String
-            keyPassword = project.properties["GKD_KEY_PASSWORD"] as String
+            storeFile = file(project.properties["JUMP_STORE_FILE"] as String)
+            storePassword = project.properties["JUMP_STORE_PASSWORD"] as String
+            keyAlias = project.properties["JUMP_KEY_ALIAS"] as String
+            keyPassword = project.properties["JUMP_KEY_PASSWORD"] as String
         }
     } else {
         signingConfigs.getByName("debug")
@@ -114,14 +115,14 @@ android {
         debug {
             versionNameSuffix = vnSuffix
             applicationIdSuffix = ".debug"
-            resValue("string", "app_name", "GKD-debug")
+            resValue("string", "app_name", "JUMP-debug")
             resValue("string", "capture_label", "捕获快照-debug")
-            resValue("string", "import_desc", "GKD-debug-导入数据")
+            resValue("string", "import_desc", "JUMP-debug-导入数据")
         }
     }
     productFlavors {
         flavorDimensions += "channel"
-        create("gkd") {
+        create("jump") {
             isDefault = true
             manifestPlaceholders["updateEnabled"] = true
         }

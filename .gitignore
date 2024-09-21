@@ -13,7 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
-.idea
+.idea/*
+!.idea/icon.svg
 /kotlin-js-store
 .vscode
 
