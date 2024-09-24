@@ -14,15 +14,12 @@ import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.Utils
 import com.hjq.toast.Toaster
-import com.tencent.mmkv.MMKV
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import com.sugarscat.jump.data.selfAppInfo
 import com.sugarscat.jump.debug.clearHttpSubs
 import com.sugarscat.jump.notif.initChannel
 import com.sugarscat.jump.permission.updatePermissionState
 import com.sugarscat.jump.service.JumpAbService
+import com.sugarscat.jump.ui.COMMIT_URL
 import com.sugarscat.jump.util.SafeR
 import com.sugarscat.jump.util.initAppState
 import com.sugarscat.jump.util.initFolder
@@ -30,6 +27,10 @@ import com.sugarscat.jump.util.initStore
 import com.sugarscat.jump.util.initSubsState
 import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.setReactiveToastStyle
+import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 
@@ -49,7 +50,7 @@ val applicationInfo by lazy {
 data object META {
     val channel by lazy { applicationInfo.metaData.getString("channel")!! }
     val commitId by lazy { applicationInfo.metaData.getString("commitId")!! }
-    val commitUrl by lazy { "https://github.com/sugarscat/jump/commit/$commitId" }
+    val commitUrl by lazy { COMMIT_URL + commitId }
     val commitTime by lazy { applicationInfo.metaData.getLong("commitTime") }
     val updateEnabled by lazy { applicationInfo.metaData.getBoolean("updateEnabled") }
     val debuggable by lazy { applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0 }

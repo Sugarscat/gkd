@@ -22,9 +22,8 @@ import androidx.compose.ui.unit.sp
 import com.blankj.utilcode.util.ScreenUtils
 import com.hjq.toast.Toaster
 import com.hjq.toast.style.WhiteToastStyle
-import kotlinx.coroutines.Dispatchers
 import com.sugarscat.jump.app
-import com.sugarscat.jump.appScope
+import kotlinx.coroutines.Dispatchers
 
 
 fun toast(text: CharSequence) {
@@ -32,7 +31,7 @@ fun toast(text: CharSequence) {
 }
 
 private val darkTheme: Boolean
-    get() = storeFlow.value.enableDarkTheme ?: com.sugarscat.jump.app.resources.configuration.let {
+    get() = storeFlow.value.enableDarkTheme ?: app.resources.configuration.let {
         it.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 

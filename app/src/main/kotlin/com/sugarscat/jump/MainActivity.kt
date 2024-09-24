@@ -38,6 +38,8 @@ import com.sugarscat.jump.service.JumpAbService
 import com.sugarscat.jump.service.ManageService
 import com.sugarscat.jump.service.fixRestartService
 import com.sugarscat.jump.service.updateLauncherAppId
+import com.sugarscat.jump.ui.SHIZUKU_APP_ID
+import com.sugarscat.jump.ui.SHIZUKU_URL
 import com.sugarscat.jump.ui.component.BuildDialog
 import com.sugarscat.jump.ui.theme.AppTheme
 import com.sugarscat.jump.util.LocalNavController
@@ -198,7 +200,7 @@ private fun Activity.fixTopPadding() {
 private fun ShizukuErrorDialog(stateFlow: MutableStateFlow<Boolean>) {
     val state = stateFlow.collectAsState()
     if (state.value) {
-        val appId = "moe.shizuku.privileged.api"
+        val appId = SHIZUKU_APP_ID
         val appInfoCache = appInfoCacheFlow.collectAsState()
         val installed = appInfoCache.value.contains(appId)
         AlertDialog(
@@ -224,7 +226,7 @@ private fun ShizukuErrorDialog(stateFlow: MutableStateFlow<Boolean>) {
                 } else {
                     TextButton(onClick = {
                         stateFlow.value = false
-                        app.openUri("https://shizuku.rikka.app/")
+                        app.openUri(SHIZUKU_URL)
                     }) {
                         Text(text = getString(R.string.go_to_download))
                     }

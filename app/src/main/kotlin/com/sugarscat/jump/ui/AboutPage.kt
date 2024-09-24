@@ -30,7 +30,6 @@ import com.sugarscat.jump.ui.style.EmptyHeight
 import com.sugarscat.jump.ui.style.itemPadding
 import com.sugarscat.jump.util.LocalNavController
 import com.sugarscat.jump.util.ProfileTransitions
-import com.sugarscat.jump.util.REPOSITORY_URL
 import com.sugarscat.jump.util.format
 import com.sugarscat.jump.util.openUri
 

@@ -133,7 +133,7 @@ fun AuthA11yPage() {
                         modifier = Modifier
                             .padding(cardHorizontalPadding, 0.dp)
                             .clickable {
-                                context.openUri("https://gkd.li/?r=2")
+                                context.openUri(HELP_FAQ_URL)
                             },
                         text = getString(R.string.unable_to_turn_on_accessibility),
                         style = MaterialTheme.typography.bodySmall,

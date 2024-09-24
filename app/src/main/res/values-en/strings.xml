@@ -175,7 +175,7 @@
     <string name="enter_an_integer">Please enter an integer from 5000–65535</string>
     <string name="share_log_files">Share log files</string>
     <string name="generate_link">Generate link</string>
-    <string name="enter_github_cookies">Please enter github cookies</string>
+    <string name="enter_github_cookie">Please enter github cookies</string>
     <string name="shizuku_authorization">Authorized by Shizuku</string>
     <string name="shizuku_authorization_desc">"Advanced mode: accurately distinguish interface IDs and force simulated clicks."</string>
     <string name="shizuku_authorization_failed">Fail  to authorize by Shizuku</string>
@@ -195,8 +195,8 @@
     <string name="hide_status_bar_desc">Hide the status bar at the top of the screenshot</string>
     <string name="save_tips">Save tips</string>
     <string name="save_tips_desc">When saving, it prompts "Saving snapshot"</string>
-    <string name="github_cookies">Github Cookies</string>
-    <string name="github_cookies_desc">Generate snapshot or log link</string>
+    <string name="github_cookie">GitHub Cookie</string>
+    <string name="github_cookie_desc">Generate snapshot or log link</string>
     <string name="view_tutorial">View tutorial</string>
     <string name="record_interface">Record interface</string>
     <string name="record_interface_desc">Record open applications and interfaces</string>
@@ -352,4 +352,5 @@
     <string name="shizuku_not_installed">Shizuku is not installed, please download and install it first.</string>
     <string name="open_shizuku">Open Shizuku</string>
     <string name="go_to_download">Go to download</string>
+    <string name="shizuku">Shizuku</string>
 </resources>

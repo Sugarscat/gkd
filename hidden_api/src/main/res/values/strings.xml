@@ -182,7 +182,7 @@
     <string name="enter_an_integer" />
     <string name="share_log_files" />
     <string name="generate_link" />
-    <string name="enter_github_cookies" />
+    <string name="enter_github_cookie" />
     <string name="shizuku_auth" />
     <string name="shizuku_auth_desc" />
     <string name="shizuku_auth_failed" />
@@ -207,8 +207,8 @@
     <string name="hide_status_bar_desc" />
     <string name="save_tips" />
     <string name="save_tips_desc" />
-    <string name="github_cookies" />
-    <string name="github_cookies_desc" />
+    <string name="github_cookie" />
+    <string name="github_cookie_desc" />
     <string name="view_tutorial" />
     <string name="record_interface" />
     <string name="record_interface_desc" />
@@ -381,4 +381,6 @@
     <string name="delete_record_tip" />
     <string name="shizuku_authorization_desc" />
     <string name="shizuku_authorization_failed" />
+    <string name="global_app_rule_trigger" />
+    <string name="shizuku" />
 </resources>

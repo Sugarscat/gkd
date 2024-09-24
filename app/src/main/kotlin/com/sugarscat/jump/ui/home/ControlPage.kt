@@ -41,12 +41,12 @@ import com.sugarscat.jump.permission.writeSecureSettingsState
 import com.sugarscat.jump.service.JumpAbService
 import com.sugarscat.jump.service.ManageService
 import com.sugarscat.jump.service.switchA11yService
+import com.sugarscat.jump.ui.APP_WEBSITE
 import com.sugarscat.jump.ui.component.AuthCard
 import com.sugarscat.jump.ui.component.SettingItem
 import com.sugarscat.jump.ui.component.TextSwitch
 import com.sugarscat.jump.ui.style.EmptyHeight
 import com.sugarscat.jump.ui.style.itemPadding
-import com.sugarscat.jump.util.HOME_PAGE_URL
 import com.sugarscat.jump.util.LocalNavController
 import com.sugarscat.jump.util.launchAsFn
 import com.sugarscat.jump.util.openUri
@@ -80,7 +80,7 @@ fun useControlPage(): ScaffoldExt {
                         contentDescription = null,
                     )
                 }
-                IconButton(onClick = throttle { context.openUri(HOME_PAGE_URL) }) {
+                IconButton(onClick = throttle { context.openUri(APP_WEBSITE) }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
                         contentDescription = null,

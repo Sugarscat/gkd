@@ -238,9 +238,9 @@ fun AdvancedPage() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(text = "Github Cookie")
+                    Text(text = getString(R.string.github_cookie))
                     IconButton(onClick = throttle {
-                        context.openUri("https://gkd.li/?r=1")
+                        context.openUri(HELP_URL)
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
@@ -255,7 +255,7 @@ fun AdvancedPage() {
                     onValueChange = {
                         value = it.filter { c -> c != '\n' && c != '\r' }
                     },
-                    placeholder = { Text(text = getString(R.string.enter_github_cookies)) },
+                    placeholder = { Text(text = getString(R.string.enter_github_cookie)) },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 10,
                 )
@@ -299,7 +299,7 @@ fun AdvancedPage() {
                 .padding(contentPadding),
         ) {
             Text(
-                text = "Shizuku",
+                text = getString(R.string.shizuku),
                 modifier = Modifier.titleItemPadding(),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
@@ -509,11 +509,11 @@ fun AdvancedPage() {
             }
 
             SettingItem(
-                title = getString(R.string.github_cookies),
-                subtitle = getString(R.string.github_cookies_desc),
+                title = getString(R.string.github_cookie),
+                subtitle = getString(R.string.github_cookie_desc),
                 suffix = getString(R.string.view_tutorial),
                 onSuffixClick = {
-                    context.openUri("https://gkd.li/?r=1")
+                    context.openUri(HELP_URL)
                 },
                 imageVector = Icons.Default.Edit,
                 onClick = {

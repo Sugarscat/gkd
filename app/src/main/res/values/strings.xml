@@ -175,7 +175,7 @@
     <string name="enter_an_integer">请输入 5000–65535 的整数</string>
     <string name="share_log_files">分享日志文件</string>
     <string name="generate_link">生成链接（需要科学上网）</string>
-    <string name="enter_github_cookies">请输入 Github Cookies</string>
+    <string name="enter_github_cookie">请输入 GitHub Cookie</string>
     <string name="shizuku_authorization">Shizuku 授权</string>
     <string name="shizuku_authorization_desc">"高级模式：准确区别界面ID，强制模拟点击。"</string>
     <string name="shizuku_authorization_failed">Shizuku 授权错误</string>
@@ -195,8 +195,8 @@
     <string name="hide_status_bar_desc">隐藏截图顶部状态栏</string>
     <string name="save_tips">保存提示</string>
     <string name="save_tips_desc">保存时提示"正在保存快照"</string>
-    <string name="github_cookies">Github Cookies</string>
-    <string name="github_cookies_desc">生成快照/日志链接</string>
+    <string name="github_cookie">GitHub Cookie</string>
+    <string name="github_cookie_desc">生成快照/日志链接</string>
     <string name="view_tutorial">查看教程</string>
     <string name="record_interface">记录界面</string>
     <string name="record_interface_desc">记录打开的应用及界面</string>
@@ -352,4 +352,5 @@
     <string name="shizuku_not_installed">Shizuku 未安装，请先下载后安装。</string>
     <string name="open_shizuku">打开 Shizuku</string>
     <string name="go_to_download">去下载</string>
+    <string name="shizuku">Shizuku</string>
 </resources>
