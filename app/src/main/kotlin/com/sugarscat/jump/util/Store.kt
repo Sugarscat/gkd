@@ -1,6 +1,8 @@
 package com.sugarscat.jump.util
 
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import com.sugarscat.jump.appScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,7 +81,7 @@ data class Store(
     val showSaveSnapshotToast: Boolean = true,
     val useSystemToast: Boolean = false,
     val useCustomNotIfText: Boolean = false,
-    val customNotIfText: String = "\${i}全局/\${k}应用/\${u}规则组/\${n}触发",
+    val customNotIfText: String = getString(R.string.global_app_rule_trigger),
     val enableActivityLog: Boolean = false,
     val updateChannel: Int = if (com.sugarscat.jump.META.versionName.contains("beta")) UpdateChannelOption.Beta.value else UpdateChannelOption.Stable.value,
 )

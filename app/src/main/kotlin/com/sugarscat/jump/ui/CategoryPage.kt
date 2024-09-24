@@ -44,10 +44,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import kotlinx.coroutines.Dispatchers
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.CategoryConfig
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.db.DbSet
@@ -65,6 +66,7 @@ import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
 import com.sugarscat.jump.util.updateSubscription
+import kotlinx.coroutines.Dispatchers
 
 @Destination<RootGraph>(style = ProfileTransitions::class)
 @Composable
@@ -103,13 +105,13 @@ fun CategoryPage(subsItemId: Long) {
         }, title = {
             TowLineText(
                 title = subsRaw?.name ?: subsItemId.toString(),
-                subTitle = "规则类别"
+                subTitle = getString(R.string.rule_category)
             )
         }, actions = {
             IconButton(onClick = throttle {
                 context.mainVm.dialogFlow.updateDialogOptions(
-                    title = "开关优先级",
-                    text = "规则手动配置 > 分类手动配置 > 分类默认 > 规则默认\n\n重置开关: 移除规则手动配置",
+                    title = getString(R.string.switch_priority),
+                    text = getString(R.string.switch_priority_desc),
                 )
             }) {
                 Icon(Icons.Outlined.Info, contentDescription = null)
@@ -146,13 +148,13 @@ fun CategoryPage(subsItemId: Long) {
                         if (size > 0) {
                             val appSize = categoriesApps[category]?.size ?: 0
                             Text(
-                                text = "${appSize}应用/${size}规则组",
+                                text = getString(R.string.app_rule_group, appSize, size),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         } else {
                             Text(
-                                text = "暂无规则",
+                                text = getString(R.string.no_rules),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
@@ -175,7 +177,7 @@ fun CategoryPage(subsItemId: Long) {
                             onDismissRequest = { expanded = false }
                         ) {
                             DropdownMenuItem(text = {
-                                Text(text = "重置开关")
+                                Text(text = getString(R.string.reset_settings))
                             }, onClick = {
                                 expanded = false
                                 vm.viewModelScope.launchTry(Dispatchers.IO) {
@@ -184,27 +186,33 @@ fun CategoryPage(subsItemId: Long) {
                                         groups
                                     )
                                     if (updatedList.isNotEmpty()) {
-                                        toast("成功重置 ${updatedList.size} 规则组开关")
+                                        toast(getString(R.string.reset_rule_settings_tip))
                                     } else {
-                                        toast("无可重置规则组")
+                                        toast(getString(R.string.no_rule_can_reset))
                                     }
                                 }
                             })
                             if (editable) {
                                 DropdownMenuItem(text = {
-                                    Text(text = "编辑")
+                                    Text(text = getString(R.string.edit))
                                 }, onClick = {
                                     expanded = false
                                     setEditNameCategory(category)
                                 })
                                 DropdownMenuItem(text = {
-                                    Text(text = "删除", color = MaterialTheme.colorScheme.error)
+                                    Text(
+                                        text = getString(R.string.delete),
+                                        color = MaterialTheme.colorScheme.error
+                                    )
                                 }, onClick = {
                                     expanded = false
                                     vm.viewModelScope.launchTry {
                                         context.mainVm.dialogFlow.waitResult(
-                                            title = "删除类别",
-                                            text = "确定删除 ${category.name} ?",
+                                            title = getString(R.string.delete_category),
+                                            text = getString(
+                                                R.string.confirm_deletion_tip,
+                                                category.name
+                                            ),
                                             error = true,
                                         )
                                         subsItem?.apply {
@@ -214,7 +222,7 @@ fun CategoryPage(subsItemId: Long) {
                                         DbSet.categoryConfigDao.deleteByCategoryKey(
                                             subsItemId, category.key
                                         )
-                                        toast("删除成功")
+                                        toast(getString(R.string.delete_success))
                                     }
                                 })
                             }
@@ -266,7 +274,7 @@ fun CategoryPage(subsItemId: Long) {
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (categories.isEmpty()) {
-                    EmptyText(text = "暂无类别")
+                    EmptyText(text = getString(R.string.no_category))
                 } else if (editable) {
                     Spacer(modifier = Modifier.height(EmptyHeight))
                 }
@@ -279,12 +287,12 @@ fun CategoryPage(subsItemId: Long) {
         var source by remember {
             mutableStateOf(editNameCategory.name)
         }
-        AlertDialog(title = { Text(text = "编辑类别") }, text = {
+        AlertDialog(title = { Text(text = getString(R.string.edit_category)) }, text = {
             OutlinedTextField(
                 value = source,
                 onValueChange = { source = it.trim() },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = "请输入类别名称") },
+                placeholder = { Text(text = getString(R.string.input_category_tip)) },
                 singleLine = true
             )
         }, onDismissRequest = {
@@ -293,12 +301,12 @@ fun CategoryPage(subsItemId: Long) {
             }
         }, dismissButton = {
             TextButton(onClick = { setEditNameCategory(null) }) {
-                Text(text = "取消")
+                Text(text = getString(R.string.cancel))
             }
         }, confirmButton = {
             TextButton(enabled = source.isNotBlank() && source != editNameCategory.name, onClick = {
                 if (categories.any { c -> c.key != editNameCategory.key && c.name == source }) {
-                    toast("不可添加同名类别")
+                    toast(getString(R.string.category_name_duplicate))
                     return@TextButton
                 }
                 vm.viewModelScope.launchTry(Dispatchers.IO) {
@@ -314,11 +322,11 @@ fun CategoryPage(subsItemId: Long) {
                         )
                         DbSet.subsItemDao.update(copy(mtime = System.currentTimeMillis()))
                     }
-                    toast("修改成功")
+                    toast(getString(R.string.edit_success))
                     setEditNameCategory(null)
                 }
             }) {
-                Text(text = "确认")
+                Text(text = getString(R.string.confirm))
             }
         })
     }
@@ -326,12 +334,12 @@ fun CategoryPage(subsItemId: Long) {
         var source by remember {
             mutableStateOf("")
         }
-        AlertDialog(title = { Text(text = "添加类别") }, text = {
+        AlertDialog(title = { Text(text = getString(R.string.add_category)) }, text = {
             OutlinedTextField(
                 value = source,
                 onValueChange = { source = it.trim() },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = "请输入类别名称") },
+                placeholder = { Text(text = getString(R.string.input_category_tip)) },
                 singleLine = true
             )
         }, onDismissRequest = {
@@ -340,12 +348,12 @@ fun CategoryPage(subsItemId: Long) {
             }
         }, dismissButton = {
             TextButton(onClick = { showAddDlg = false }) {
-                Text(text = "取消")
+                Text(text = getString(R.string.cancel))
             }
         }, confirmButton = {
             TextButton(enabled = source.isNotEmpty(), onClick = {
                 if (categories.any { c -> c.name == source }) {
-                    toast("不可添加同名类别")
+                    toast(getString(R.string.category_name_duplicate))
                     return@TextButton
                 }
                 showAddDlg = false
@@ -358,11 +366,11 @@ fun CategoryPage(subsItemId: Long) {
                             })
                         )
                         DbSet.subsItemDao.update(copy(mtime = System.currentTimeMillis()))
-                        toast("添加成功")
+                        toast(getString(R.string.add_success))
                     }
                 }
             }) {
-                Text(text = "确认")
+                Text(text = getString(R.string.confirm))
             }
         })
     }

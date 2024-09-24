@@ -27,12 +27,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.generated.destinations.ActivityLogPageDestination
 import com.ramcosta.composedestinations.generated.destinations.AuthA11YPageDestination
 import com.ramcosta.composedestinations.generated.destinations.ClickLogPageDestination
 import com.ramcosta.composedestinations.generated.destinations.SlowGroupPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.permission.notificationState
 import com.sugarscat.jump.permission.requiredPermission
 import com.sugarscat.jump.permission.writeSecureSettingsState
@@ -52,7 +54,7 @@ import com.sugarscat.jump.util.ruleSummaryFlow
 import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.throttle
 
-val controlNav = BottomNavItem(label = "主页", icon = Icons.Outlined.Home)
+val controlNav = BottomNavItem(label = getString(R.string.nav_home), icon = Icons.Outlined.Home)
 
 @Composable
 fun useControlPage(): ScaffoldExt {
@@ -106,8 +108,12 @@ fun useControlPage(): ScaffoldExt {
         ) {
             if (writeSecureSettings) {
                 TextSwitch(
-                    title = "服务状态",
-                    subtitle = if (store.enableService) "无障碍服务正在运行" else "无障碍服务已关闭",
+                    title = getString(R.string.service_status),
+                    subtitle =
+                    if (store.enableService)
+                        getString(R.string.accessibility_is_running)
+                    else
+                        getString(R.string.accessibility_is_not_available),
                     checked = store.enableService,
                     onCheckedChange = {
                         switchA11yService()
@@ -115,16 +121,20 @@ fun useControlPage(): ScaffoldExt {
             }
             if (!writeSecureSettings && !a11yRunning) {
                 AuthCard(
-                    title = "无障碍授权",
-                    desc = if (a11yBroken) "服务故障,请重新授权" else "授权使无障碍服务运行",
+                    title = getString(R.string.authorize_accessibility),
+                    desc =
+                    if (a11yBroken)
+                        getString(R.string.authorization_failed)
+                    else
+                        getString(R.string.authorization_success),
                     onAuthClick = {
                         navController.toDestinationsNavigator().navigate(AuthA11YPageDestination)
                     })
             }
 
             TextSwitch(
-                title = "常驻通知",
-                subtitle = "显示运行状态及统计数据",
+                title = getString(R.string.resident_notice),
+                subtitle = getString(R.string.resident_notice_desc),
                 checked = manageRunning && store.enableStatusService,
                 onCheckedChange = vm.viewModelScope.launchAsFn<Boolean> {
                     if (it) {
@@ -142,8 +152,8 @@ fun useControlPage(): ScaffoldExt {
                 })
 
             SettingItem(
-                title = "触发记录",
-                subtitle = "如误触可定位关闭规则",
+                title = getString(R.string.triggered_record),
+                subtitle = getString(R.string.triggered_record_desc),
                 onClick = {
                     navController.toDestinationsNavigator().navigate(ClickLogPageDestination)
                 }
@@ -151,8 +161,8 @@ fun useControlPage(): ScaffoldExt {
 
             if (store.enableActivityLog) {
                 SettingItem(
-                    title = "界面记录",
-                    subtitle = "记录打开的应用及界面",
+                    title = getString(R.string.interface_record),
+                    subtitle = getString(R.string.interface_record_desc),
                     onClick = {
                         navController.toDestinationsNavigator().navigate(ActivityLogPageDestination)
                     }
@@ -161,8 +171,8 @@ fun useControlPage(): ScaffoldExt {
 
             if (ruleSummary.slowGroupCount > 0) {
                 SettingItem(
-                    title = "耗时查询-${ruleSummary.slowGroupCount}",
-                    subtitle = "可能导致触发缓慢或更多耗电",
+                    title = getString(R.string.time_consuming, ruleSummary.slowGroupCount),
+                    subtitle = getString(R.string.time_consuming_desc),
                     onClick = {
                         navController.toDestinationsNavigator().navigate(SlowGroupPageDestination)
                     }
@@ -180,7 +190,7 @@ fun useControlPage(): ScaffoldExt {
                 )
                 if (latestRecordDesc != null) {
                     Text(
-                        text = "最近点击: $latestRecordDesc",
+                        text = getString(R.string.recent_clicks, latestRecordDesc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,

@@ -1,9 +1,10 @@
 package com.sugarscat.jump.util
 
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlin.collections.hashMapOf
 
 fun formatTimeAgo(timestamp: Long): String {
     val currentTime = System.currentTimeMillis()
@@ -16,13 +17,13 @@ fun formatTimeAgo(timestamp: Long): String {
     val months = (days / 30)
     val years = (days / 365)
     return when {
-        years > 0 -> "${years}年前"
-        months > 0 -> "${months}月前"
-        weeks > 0 -> "${weeks}周前"
-        days > 0 -> "${days}天前"
-        hours > 0 -> "${hours}小时前"
-        minutes > 0 -> "${minutes}分钟前"
-        else -> "刚刚"
+        years > 0 -> getString(R.string.years_ago, years)
+        months > 0 -> getString(R.string.months_ago, months)
+        weeks > 0 -> getString(R.string.weeks_ago, weeks)
+        days > 0 -> getString(R.string.days_ago, days)
+        hours > 0 -> getString(R.string.hours_ago, hours)
+        minutes > 0 -> getString(R.string.minutes_ago, minutes)
+        else -> getString(R.string.just)
     }
 }
 

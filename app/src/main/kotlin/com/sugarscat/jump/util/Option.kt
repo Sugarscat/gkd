@@ -1,5 +1,8 @@
 package com.sugarscat.jump.util
 
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
+
 sealed interface Option<T> {
     val value: T
     val label: String
@@ -21,9 +24,9 @@ val <T> Option<T>.allSubObject: Array<Option<T>>
     } as Array<Option<T>>
 
 sealed class SortTypeOption(override val value: Int, override val label: String) : Option<Int> {
-    data object SortByName : SortTypeOption(0, "按名称")
-    data object SortByAppMtime : SortTypeOption(1, "按更新时间")
-    data object SortByTriggerTime : SortTypeOption(2, "按触发时间")
+    data object SortByName : SortTypeOption(0, getString(R.string.by_name))
+    data object SortByAppMtime : SortTypeOption(1, getString(R.string.by_update_time))
+    data object SortByTriggerTime : SortTypeOption(2, getString(R.string.by_trigger_time))
 
     companion object {
         // https://stackoverflow.com/questions/47648689
@@ -35,10 +38,13 @@ sealed class UpdateTimeOption(
     override val value: Long,
     override val label: String
 ) : Option<Long> {
-    data object Pause : UpdateTimeOption(-1, "暂停")
-    data object Everyday : UpdateTimeOption(24 * 60 * 60_000, "每天")
-    data object Every3Days : UpdateTimeOption(24 * 60 * 60_000 * 3, "每3天")
-    data object Every7Days : UpdateTimeOption(24 * 60 * 60_000 * 7, "每7天")
+    data object Pause : UpdateTimeOption(-1, getString(R.string.pause))
+    data object Everyday : UpdateTimeOption(24 * 60 * 60_000, getString(R.string.every_day))
+    data object Every3Days :
+        UpdateTimeOption(24 * 60 * 60_000 * 3, getString(R.string.every_3_days))
+
+    data object Every7Days :
+        UpdateTimeOption(24 * 60 * 60_000 * 7, getString(R.string.every_7_days))
 
     companion object {
         val allSubObject by lazy { arrayOf(Pause, Everyday, Every3Days, Every7Days) }
@@ -49,9 +55,9 @@ sealed class DarkThemeOption(
     override val value: Boolean?,
     override val label: String
 ) : Option<Boolean?> {
-    data object FollowSystem : DarkThemeOption(null, "跟随系统")
-    data object AlwaysEnable : DarkThemeOption(true, "总是启用")
-    data object AlwaysDisable : DarkThemeOption(false, "总是关闭")
+    data object FollowSystem : DarkThemeOption(null, getString(R.string.follow_system))
+    data object AlwaysEnable : DarkThemeOption(true, getString(R.string.always_enabled))
+    data object AlwaysDisable : DarkThemeOption(false, getString(R.string.always_disabled))
 
     companion object {
         val allSubObject by lazy { arrayOf(FollowSystem, AlwaysEnable, AlwaysDisable) }
@@ -62,9 +68,9 @@ sealed class EnableGroupOption(
     override val value: Boolean?,
     override val label: String
 ) : Option<Boolean?> {
-    data object FollowSubs : DarkThemeOption(null, "跟随订阅")
-    data object AllEnable : DarkThemeOption(true, "全部启用")
-    data object AllDisable : DarkThemeOption(false, "全部关闭")
+    data object FollowSubs : DarkThemeOption(null, getString(R.string.follow_subscribe))
+    data object AllEnable : DarkThemeOption(true, getString(R.string.enable_all))
+    data object AllDisable : DarkThemeOption(false, getString(R.string.disable_all))
 
     companion object {
         val allSubObject by lazy { arrayOf(FollowSubs, AllEnable, AllDisable) }
@@ -72,9 +78,9 @@ sealed class EnableGroupOption(
 }
 
 sealed class RuleSortOption(override val value: Int, override val label: String) : Option<Int> {
-    data object Default : RuleSortOption(0, "按订阅顺序")
-    data object ByTime : RuleSortOption(1, "按触发时间")
-    data object ByName : RuleSortOption(2, "按名称")
+    data object Default : RuleSortOption(0, getString(R.string.by_subscription))
+    data object ByTime : RuleSortOption(1, getString(R.string.by_trigger_time))
+    data object ByName : RuleSortOption(2, getString(R.string.by_name))
 
     companion object {
         val allSubObject by lazy { arrayOf(Default, ByTime, ByName) }
@@ -87,11 +93,11 @@ sealed class UpdateChannelOption(
 ) : Option<Int> {
     abstract val url: String
 
-    data object Stable : UpdateChannelOption(0, "稳定版") {
+    data object Stable : UpdateChannelOption(0, getString(R.string.stable_version)) {
         override val url = "https://registry.npmmirror.com/@gkd-kit/app/latest/files/index.json"
     }
 
-    data object Beta : UpdateChannelOption(1, "测试版") {
+    data object Beta : UpdateChannelOption(1, getString(R.string.beta_version)) {
         override val url =
             "https://registry.npmmirror.com/@gkd-kit/app-beta/latest/files/index.json"
     }

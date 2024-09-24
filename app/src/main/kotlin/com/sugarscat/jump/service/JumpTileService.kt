@@ -6,11 +6,13 @@ import android.os.Looper
 import android.provider.Settings
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import kotlinx.coroutines.flow.update
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import com.sugarscat.jump.permission.writeSecureSettingsState
 import com.sugarscat.jump.util.lastRestartA11yServiceTimeFlow
 import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.flow.update
 
 class JumpTileService : TileService() {
     private fun updateTile(): Boolean {
@@ -88,7 +90,7 @@ private fun enableA11yService() {
 
 fun switchA11yService(): Boolean {
     if (!writeSecureSettingsState.updateAndGet()) {
-        toast("请先授予[写入安全设置]权限")
+        toast(getString(R.string.write_security_settings_permission_required))
         return false
     }
     val names = getServiceNames()
@@ -96,7 +98,7 @@ fun switchA11yService(): Boolean {
         names.remove(a11yClsName)
         updateServiceNames(names)
         storeFlow.update { it.copy(enableService = false) }
-        toast("关闭无障碍")
+        toast(getString(R.string.turn_off_accessibility))
     } else {
         enableA11yService()
         if (names.contains(a11yClsName)) { // 当前无障碍异常, 重启服务
@@ -106,7 +108,7 @@ fun switchA11yService(): Boolean {
         names.add(a11yClsName)
         updateServiceNames(names)
         storeFlow.update { it.copy(enableService = true) }
-        toast("开启无障碍")
+        toast(getString(R.string.enabled_accessibility))
     }
     return true
 }
@@ -128,7 +130,7 @@ fun fixRestartService(): Boolean {
         }
         names.add(a11yClsName)
         updateServiceNames(names)
-        toast("重启无障碍")
+        toast(getString(R.string.restart_accessibility))
         return true
     }
     return false

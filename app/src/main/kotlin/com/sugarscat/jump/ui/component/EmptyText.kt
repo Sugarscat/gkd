@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 
 @Composable
-fun EmptyText(text: String = "暂无数据") {
+fun EmptyText(text: String = getString(R.string.no_data)) {
     Text(
         text = text,
         modifier = Modifier.fillMaxWidth(),

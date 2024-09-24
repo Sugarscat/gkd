@@ -3,9 +3,6 @@
     <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar"></style>
 
     <style name="SplashScreenTheme" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenAnimatedIcon">
-            @mipmap/gkd_black
-        </item>
         <item name="windowSplashScreenAnimationDuration">1000</item>
         <!-- postSplashScreenTheme must invoke installSplashScreen -->
         <item name="postSplashScreenTheme">@style/AppTheme</item>

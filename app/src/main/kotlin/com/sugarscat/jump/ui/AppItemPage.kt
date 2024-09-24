@@ -55,14 +55,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.ClipboardUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ImagePreviewPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.jsonObject
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.ExcludeData
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsConfig
@@ -83,6 +82,9 @@ import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
 import com.sugarscat.jump.util.updateSubscription
+import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.jsonObject
 import li.songe.json5.Json5
 import li.songe.json5.encodeToJson5String
 
@@ -203,7 +205,7 @@ fun AppItemPage(
                                 )
                             } else {
                                 Text(
-                                    text = "暂无描述",
+                                    text = getString(R.string.no_desc),
                                     modifier = Modifier.fillMaxWidth(),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -211,7 +213,7 @@ fun AppItemPage(
                             }
                         } else {
                             Text(
-                                text = "非法选择器",
+                                text = getString(R.string.illegal_selector),
                                 modifier = Modifier.fillMaxWidth(),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error
@@ -239,7 +241,7 @@ fun AppItemPage(
                         ) {
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "复制")
+                                    Text(text = getString(R.string.copy))
                                 },
                                 onClick = {
                                     val groupAppText = json.encodeToJson5String(
@@ -248,14 +250,14 @@ fun AppItemPage(
                                         )
                                     )
                                     ClipboardUtils.copyText(groupAppText)
-                                    toast("复制成功")
+                                    toast(getString(R.string.copied))
                                     expanded = false
                                 },
                             )
                             if (editable) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(text = "编辑")
+                                        Text(text = getString(R.string.edit))
                                     },
                                     onClick = {
                                         setEditGroupRaw(group)
@@ -265,7 +267,7 @@ fun AppItemPage(
                             }
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "编辑禁用")
+                                    Text(text = getString(R.string.edit_disabled))
                                 },
                                 onClick = {
                                     setExcludeGroupRaw(group)
@@ -275,7 +277,7 @@ fun AppItemPage(
                             if (subsConfig?.enable != null) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(text = "重置开关")
+                                        Text(text = getString(R.string.reset))
                                     },
                                     onClick = {
                                         expanded = false
@@ -288,14 +290,20 @@ fun AppItemPage(
                             if (editable && subsRaw != null && subsItem != null) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(text = "删除", color = MaterialTheme.colorScheme.error)
+                                        Text(
+                                            text = getString(R.string.delete),
+                                            color = MaterialTheme.colorScheme.error
+                                        )
                                     },
                                     onClick = {
                                         expanded = false
                                         vm.viewModelScope.launchTry {
                                             context.mainVm.dialogFlow.waitResult(
-                                                title = "删除规则组",
-                                                text = "确定删除规则组 ${group.name} ?",
+                                                title = getString(R.string.delete_rule_group),
+                                                text = getString(
+                                                    R.string.delete_rule_group_tip,
+                                                    group.name
+                                                ),
                                                 error = true,
                                             )
                                             val newSubsRaw = subsRaw.copy(
@@ -316,7 +324,7 @@ fun AppItemPage(
                                             DbSet.subsConfigDao.delete(
                                                 subsItem.id, appRaw.id, group.key
                                             )
-                                            toast("删除成功")
+                                            toast(getString(R.string.delete_success))
                                         }
                                     },
                                 )
@@ -343,7 +351,7 @@ fun AppItemPage(
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (appRaw.groups.isEmpty()) {
-                    EmptyText(text = "暂无规则")
+                    EmptyText(text = getString(R.string.no_rules))
                 } else if (editable) {
                     Spacer(modifier = Modifier.height(EmptyHeight))
                 }
@@ -355,7 +363,7 @@ fun AppItemPage(
         AlertDialog(
             onDismissRequest = { setShowGroupItem(null) },
             title = {
-                Text(text = "规则组详情")
+                Text(text = getString(R.string.rule_group_details))
             },
             text = {
                 Column {
@@ -377,7 +385,7 @@ fun AppItemPage(
                             )
                         )
                     }) {
-                        Text(text = "查看图片")
+                        Text(text = getString(R.string.view_pictures))
                     }
                 }
             },
@@ -385,7 +393,7 @@ fun AppItemPage(
                 TextButton(onClick = throttle {
                     setShowGroupItem(null)
                 }) {
-                    Text(text = "关闭")
+                    Text(text = getString(R.string.close))
                 }
             }
         )
@@ -398,7 +406,7 @@ fun AppItemPage(
         val focusRequester = remember { FocusRequester() }
         val oldSource = remember { source }
         AlertDialog(
-            title = { Text(text = "编辑规则组") },
+            title = { Text(text = getString(R.string.edit_rule_group)) },
             text = {
                 OutlinedTextField(
                     value = source,
@@ -406,7 +414,7 @@ fun AppItemPage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    placeholder = { Text(text = "请输入规则组") },
+                    placeholder = { Text(text = getString(R.string.input_rule_group)) },
                     maxLines = 10,
                 )
                 LaunchedEffect(null) {
@@ -420,13 +428,13 @@ fun AppItemPage(
             },
             dismissButton = {
                 TextButton(onClick = { setEditGroupRaw(null) }) {
-                    Text(text = "取消")
+                    Text(text = getString(R.string.cancel))
                 }
             },
             confirmButton = {
                 TextButton(onClick = vm.viewModelScope.launchAsFn(Dispatchers.Default) {
                     if (oldSource == source) {
-                        toast("规则组无变动")
+                        toast(getString(R.string.rule_no_change))
                         setEditGroupRaw(null)
                         return@launchAsFn
                     }
@@ -435,7 +443,7 @@ fun AppItemPage(
                         Json5.parseToJson5Element(source).jsonObject
                     } catch (e: Exception) {
                         LogUtils.d(e)
-                        error("非法JSON:${e.message}")
+                        error(getString(R.string.illegal_json_tip, e.message))
                     }
                     val newGroupRaw = try {
                         if (element["groups"] is JsonArray) {
@@ -447,10 +455,10 @@ fun AppItemPage(
                         } ?: RawSubscription.parseGroup(element)
                     } catch (e: Exception) {
                         LogUtils.d(e)
-                        error("非法规则:${e.message}")
+                        error(getString(R.string.illegal_rule_tip, e.message))
                     }
                     if (newGroupRaw.key != editGroupRaw.key) {
-                        toast("不能更改规则组的key")
+                        toast(getString(R.string.rule_group_key_cannot_change))
                         return@launchAsFn
                     }
                     if (newGroupRaw.errorDesc != null) {
@@ -471,9 +479,9 @@ fun AppItemPage(
                     })
                     updateSubscription(newSubsRaw)
                     DbSet.subsItemDao.update(subsItem.copy(mtime = System.currentTimeMillis()))
-                    toast("更新成功")
+                    toast(getString(R.string.update_success))
                 }, enabled = source.isNotEmpty()) {
-                    Text(text = "更新")
+                    Text(text = getString(R.string.update))
                 }
             },
         )
@@ -489,7 +497,7 @@ fun AppItemPage(
         val oldSource = remember { source }
         val focusRequester = remember { FocusRequester() }
         AlertDialog(
-            title = { Text(text = "编辑禁用") },
+            title = { Text(text = getString(R.string.edit_disabled)) },
             text = {
                 OutlinedTextField(
                     value = source,
@@ -499,7 +507,7 @@ fun AppItemPage(
                         .focusRequester(focusRequester),
                     placeholder = {
                         Text(
-                            text = "请填入需要禁用的 activityId\n以换行或英文逗号分割",
+                            text = getString(R.string.input_activityid_tip),
                             style = LocalTextStyle.current.copy(fontSize = MaterialTheme.typography.bodySmall.fontSize)
                         )
                     },
@@ -517,13 +525,13 @@ fun AppItemPage(
             },
             dismissButton = {
                 TextButton(onClick = { setExcludeGroupRaw(null) }) {
-                    Text(text = "取消")
+                    Text(text = getString(R.string.cancel))
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     if (oldSource == source) {
-                        toast("禁用项无变动")
+                        toast(getString(R.string.prohibited_items_no_change))
                         setExcludeGroupRaw(null)
                         return@TextButton
                     }
@@ -537,10 +545,10 @@ fun AppItemPage(
                         )).copy(exclude = ExcludeData.parse(appId, source).stringify())
                     vm.viewModelScope.launchTry(Dispatchers.IO) {
                         DbSet.subsConfigDao.insert(newSubsConfig)
-                        toast("更新成功")
+                        toast(getString(R.string.update_success))
                     }
                 }) {
-                    Text(text = "更新")
+                    Text(text = getString(R.string.update))
                 }
             },
         )
@@ -550,12 +558,12 @@ fun AppItemPage(
         var source by remember {
             mutableStateOf("")
         }
-        AlertDialog(title = { Text(text = "添加规则组") }, text = {
+        AlertDialog(title = { Text(text = getString(R.string.add_rule_group)) }, text = {
             OutlinedTextField(
                 value = source,
                 onValueChange = { source = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = "请输入规则组\n可以是APP规则\n也可以是单个规则组") },
+                placeholder = { Text(text = getString(R.string.add_rule_group_tip)) },
                 maxLines = 10,
             )
         }, onDismissRequest = {
@@ -574,17 +582,17 @@ fun AppItemPage(
                         RawSubscription.parseRawGroup(source)
                     } catch (e: Exception) {
                         LogUtils.d(e)
-                        toast("非法规则:${e.message}")
+                        toast(getString(R.string.illegal_rule_tip, e.message))
                         return@TextButton
                     }
                     listOf(newGroupRaw)
                 } else {
                     if (newAppRaw.id != appRaw.id) {
-                        toast("id不一致,无法添加")
+                        toast(getString(R.string.id_is_inconsistent))
                         return@TextButton
                     }
                     if (newAppRaw.groups.isEmpty()) {
-                        toast("不能添加空规则组")
+                        toast(getString(R.string.cannot_add_empty_rule_group))
                         return@TextButton
                     }
                     newAppRaw.groups
@@ -595,7 +603,7 @@ fun AppItemPage(
                 }
                 tempGroups.forEach { g ->
                     if (appRaw.groups.any { g2 -> g2.name == g.name }) {
-                        toast("存在同名规则[${g.name}]")
+                        toast(getString(R.string.has_same_rule_name, g.name))
                         return@TextButton
                     }
                 }
@@ -619,14 +627,14 @@ fun AppItemPage(
                     DbSet.subsItemDao.update(subsItem.copy(mtime = System.currentTimeMillis()))
                     updateSubscription(newSubsRaw)
                     showAddDlg = false
-                    toast("添加成功")
+                    toast(getString(R.string.add_success))
                 }
             }, enabled = source.isNotEmpty()) {
-                Text(text = "添加")
+                Text(text = getString(R.string.add))
             }
         }, dismissButton = {
             TextButton(onClick = { showAddDlg = false }) {
-                Text(text = "取消")
+                Text(text = getString(R.string.cancel))
             }
         })
     }

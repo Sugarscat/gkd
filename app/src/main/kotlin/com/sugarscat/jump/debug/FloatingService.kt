@@ -10,12 +10,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.torrydo.floatingbubbleview.FloatingBubbleListener
-import com.torrydo.floatingbubbleview.service.expandable.BubbleBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.sugarscat.jump.R
 import com.sugarscat.jump.app
-import com.sugarscat.jump.appScope
 import com.sugarscat.jump.composition.CompositionExt.useLifeCycleLog
 import com.sugarscat.jump.composition.CompositionFbService
 import com.sugarscat.jump.data.Tuple3
@@ -24,6 +20,10 @@ import com.sugarscat.jump.notif.floatingChannel
 import com.sugarscat.jump.notif.floatingNotif
 import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.toast
+import com.torrydo.floatingbubbleview.FloatingBubbleListener
+import com.torrydo.floatingbubbleview.service.expandable.BubbleBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.sqrt
 
 class FloatingService : CompositionFbService({
@@ -66,7 +66,7 @@ class FloatingService : CompositionFbService({
                     // is onClick
                     com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
                         SnapshotExt.captureSnapshot()
-                        toast("快照成功")
+                        toast(getString(R.string.snapshot_succeeded))
                     }
                 }
             }
@@ -91,7 +91,7 @@ class FloatingService : CompositionFbService({
 
     companion object {
         val isRunning = MutableStateFlow(false)
-        fun stop(context: Context = com.sugarscat.jump.app) {
+        fun stop(context: Context = app) {
             context.stopService(Intent(context, FloatingService::class.java))
         }
     }

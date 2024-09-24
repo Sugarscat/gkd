@@ -5,4 +5,4 @@ import androidx.navigation.NavHostController
 
 
 val LocalNavController =
-    compositionLocalOf<NavHostController> { error("not found DestinationsNavigator") }
+    compositionLocalOf<NavHostController> { error("Not found DestinationsNavigator") }

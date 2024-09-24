@@ -28,12 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AppItemPageDestination
 import com.ramcosta.composedestinations.generated.destinations.GlobalRulePageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.ui.component.EmptyText
 import com.sugarscat.jump.ui.component.updateDialogOptions
 import com.sugarscat.jump.ui.style.EmptyHeight
@@ -68,12 +70,21 @@ fun SlowGroupPage() {
                         )
                     }
                 },
-                title = { Text(text = if (ruleSummary.slowGroupCount > 0) "缓慢查询-${ruleSummary.slowGroupCount}" else "缓慢查询") },
+                title = {
+                    Text(
+                        text = if (ruleSummary.slowGroupCount > 0) getString(
+                            R.string.slow_query_info,
+                            ruleSummary.slowGroupCount
+                        ) else getString(
+                            R.string.slow_query
+                        )
+                    )
+                },
                 actions = {
                     IconButton(onClick = throttle {
                         context.mainVm.dialogFlow.updateDialogOptions(
-                            title = "缓慢查询",
-                            text = "任意单个规则同时满足以下 3 个条件即判定为缓慢查询\n\n1. 选择器右侧无法快速查询且不是主动查询, 或内部使用<<且无法快速查询\n2. preKeys 为空\n3. matchTime 为空或大于 10s",
+                            title = getString(R.string.slow_query),
+                            text = getString(R.string.slow_query_desc),
                         )
                     }) {
                         Icon(Icons.Outlined.Info, contentDescription = null)
@@ -90,16 +101,18 @@ fun SlowGroupPage() {
                 SlowGroupCard(
                     modifier = Modifier
                         .clickable(onClick = throttle {
-                            navController.toDestinationsNavigator().navigate(
-                                GlobalRulePageDestination(
-                                    rule.subsItem.id,
-                                    group.key
+                            navController
+                                .toDestinationsNavigator()
+                                .navigate(
+                                    GlobalRulePageDestination(
+                                        rule.subsItem.id,
+                                        group.key
+                                    )
                                 )
-                            )
                         })
                         .itemPadding(),
                     title = group.name,
-                    desc = "${rule.rawSubs.name}/全局规则"
+                    desc = "${rule.rawSubs.name}/" + getString(R.string.global_rules)
                 )
             }
             items(
@@ -109,23 +122,26 @@ fun SlowGroupPage() {
                 SlowGroupCard(
                     modifier = Modifier
                         .clickable(onClick = throttle {
-                            navController.toDestinationsNavigator().navigate(
-                                AppItemPageDestination(
-                                    rule.subsItem.id,
-                                    rule.app.id,
-                                    group.key
+                            navController
+                                .toDestinationsNavigator()
+                                .navigate(
+                                    AppItemPageDestination(
+                                        rule.subsItem.id,
+                                        rule.app.id,
+                                        group.key
+                                    )
                                 )
-                            )
                         })
                         .itemPadding(),
                     title = group.name,
-                    desc = "${rule.rawSubs.name}/应用规则/${appInfoCache[rule.app.id]?.name ?: rule.app.name ?: rule.app.id}"
+                    desc = "${rule.rawSubs.name}/" + getString(R.string.global_rules)
+                            + "/${appInfoCache[rule.app.id]?.name ?: rule.app.name ?: rule.app.id}"
                 )
             }
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (ruleSummary.slowGroupCount == 0) {
-                    EmptyText(text = "暂无规则")
+                    EmptyText(text = getString(R.string.no_rules))
                 }
             }
         }

@@ -57,16 +57,15 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.dylanc.activityresult.launcher.launchForResult
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ActivityLogPageDestination
 import com.ramcosta.composedestinations.generated.destinations.SnapshotPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.update
 import com.sugarscat.jump.MainActivity
-import com.sugarscat.jump.appScope
+import com.sugarscat.jump.R
 import com.sugarscat.jump.debug.FloatingService
 import com.sugarscat.jump.debug.HttpService
 import com.sugarscat.jump.debug.ScreenshotService
@@ -98,6 +97,8 @@ import com.sugarscat.jump.util.shareFile
 import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
 import rikka.shizuku.Shizuku
 
 @Destination<RootGraph>(style = ProfileTransitions::class)
@@ -118,11 +119,11 @@ fun AdvancedPage() {
         var value by remember {
             mutableStateOf(store.httpServerPort.toString())
         }
-        AlertDialog(title = { Text(text = "服务端口") }, text = {
+        AlertDialog(title = { Text(text = getString(R.string.service_port)) }, text = {
             OutlinedTextField(
                 value = value,
                 placeholder = {
-                    Text(text = "请输入 5000-65535 的整数")
+                    Text(text = getString(R.string.enter_an_integer))
                 },
                 onValueChange = {
                     value = it.filter { c -> c.isDigit() }.take(5)
@@ -148,7 +149,7 @@ fun AdvancedPage() {
                 onClick = {
                     val newPort = value.toIntOrNull()
                     if (newPort == null || !(5000 <= newPort && newPort <= 65535)) {
-                        toast("请输入 5000-65535 的整数")
+                        toast(getString(R.string.enter_an_integer))
                         return@TextButton
                     }
                     storeFlow.value = store.copy(
@@ -158,13 +159,13 @@ fun AdvancedPage() {
                 }
             ) {
                 Text(
-                    text = "确认", modifier = Modifier
+                    text = getString(R.string.confirm), modifier = Modifier
                 )
             }
         }, dismissButton = {
             TextButton(onClick = { showEditPortDlg = false }) {
                 Text(
-                    text = "取消"
+                    text = getString(R.string.cancel)
                 )
             }
         })
@@ -185,18 +186,18 @@ fun AdvancedPage() {
                     .fillMaxWidth()
                     .padding(16.dp)
                 Text(
-                    text = "分享到其他应用", modifier = Modifier
+                    text = getString(R.string.share_to_other_apps), modifier = Modifier
                         .clickable(onClick = throttle {
                             showShareLogDlg = false
                             vm.viewModelScope.launchTry(Dispatchers.IO) {
                                 val logZipFile = buildLogFile()
-                                context.shareFile(logZipFile, "分享日志文件")
+                                context.shareFile(logZipFile, getString(R.string.share_log_files))
                             }
                         })
                         .then(modifier)
                 )
                 Text(
-                    text = "保存到下载", modifier = Modifier
+                    text = getString(R.string.save_to_downloads), modifier = Modifier
                         .clickable(onClick = throttle {
                             showShareLogDlg = false
                             vm.viewModelScope.launchTry(Dispatchers.IO) {
@@ -207,7 +208,7 @@ fun AdvancedPage() {
                         .then(modifier)
                 )
                 Text(
-                    text = "生成链接(需科学上网)",
+                    text = getString(R.string.generate_link),
                     modifier = Modifier
                         .clickable(onClick = throttle {
                             showShareLogDlg = false
@@ -254,7 +255,7 @@ fun AdvancedPage() {
                     onValueChange = {
                         value = it.filter { c -> c != '\n' && c != '\r' }
                     },
-                    placeholder = { Text(text = "请输入 Github Cookie") },
+                    placeholder = { Text(text = getString(R.string.enter_github_cookies)) },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 10,
                 )
@@ -264,12 +265,12 @@ fun AdvancedPage() {
                     showEditCookieDlg = false
                     privacyStoreFlow.update { it.copy(githubCookie = value.trim()) }
                 }) {
-                    Text(text = "确认")
+                    Text(text = getString(R.string.confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showEditCookieDlg = false }) {
-                    Text(text = "取消")
+                    Text(text = getString(R.string.cancel))
                 }
             }
         )
@@ -288,7 +289,7 @@ fun AdvancedPage() {
                         contentDescription = null,
                     )
                 }
-            }, title = { Text(text = "高级设置") }, actions = {})
+            }, title = { Text(text = getString(R.string.advanced_settings)) }, actions = {})
         }
     ) { contentPadding ->
         Column(
@@ -305,13 +306,13 @@ fun AdvancedPage() {
             )
             val shizukuOk by shizukuOkState.stateFlow.collectAsState()
             if (!shizukuOk) {
-                AuthCard(title = "Shizuku授权",
-                    desc = "高级模式:准确区别界面ID,强制模拟点击",
+                AuthCard(title = getString(R.string.shizuku_authorization),
+                    desc = getString(R.string.shizuku_authorization_desc),
                     onAuthClick = {
                         try {
                             Shizuku.requestPermission(Activity.RESULT_OK)
                         } catch (e: Exception) {
-                            LogUtils.d("Shizuku授权错误", e.message)
+                            LogUtils.d(getString(R.string.shizuku_authorization_failed), e.message)
                             context.mainVm.shizukuErrorFlow.value = true
                         }
                     })
@@ -324,7 +325,7 @@ fun AdvancedPage() {
             val localNetworkIps by HttpService.localNetworkIpsFlow.collectAsState()
 
             Text(
-                text = "HTTP服务",
+                text = getString(R.string.http_service),
                 modifier = Modifier.titleItemPadding(),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
@@ -335,7 +336,7 @@ fun AdvancedPage() {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "HTTP服务",
+                        text = getString(R.string.http_service),
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     CompositionLocalProvider(
@@ -343,11 +344,11 @@ fun AdvancedPage() {
                     ) {
                         if (!httpServerRunning) {
                             Text(
-                                text = "在浏览器下连接调试工具",
+                                text = getString(R.string.browser_connection),
                             )
                         } else {
                             Text(
-                                text = "点击下面任意链接打开即可自动连接",
+                                text = getString(R.string.click_links_connect_automatically),
                             )
                             Row {
                                 Text(
@@ -359,7 +360,7 @@ fun AdvancedPage() {
                                     }),
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
-                                Text(text = "仅本设备可访问")
+                                Text(text = getString(R.string.accessible_only_by_this_device))
                             }
                             localNetworkIps.forEach { host ->
                                 Text(
@@ -388,7 +389,7 @@ fun AdvancedPage() {
             }
 
             SettingItem(
-                title = "服务端口",
+                title = getString(R.string.service_port),
                 subtitle = store.httpServerPort.toString(),
                 imageVector = Icons.Default.Edit,
                 onClick = {
@@ -397,8 +398,8 @@ fun AdvancedPage() {
             )
 
             TextSwitch(
-                title = "清除订阅",
-                subtitle = "当HTTP服务关闭时,删除内存订阅",
+                title = getString(R.string.clear_subscription),
+                subtitle = getString(R.string.auto_delete_memory_subscription),
                 checked = store.autoClearMemorySubs
             ) {
                 storeFlow.value = store.copy(
@@ -407,14 +408,14 @@ fun AdvancedPage() {
             }
 
             Text(
-                text = "快照",
+                text = getString(R.string.snapshot),
                 modifier = Modifier.titleItemPadding(),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
 
             SettingItem(
-                title = "快照记录" + (if (snapshotCount > 0) "-$snapshotCount" else ""),
+                title = getString(R.string.snapshot_record) + (if (snapshotCount > 0) "-$snapshotCount" else ""),
                 onClick = {
                     navController.toDestinationsNavigator().navigate(SnapshotPageDestination)
                 }
@@ -423,8 +424,8 @@ fun AdvancedPage() {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 val screenshotRunning by ScreenshotService.isRunning.collectAsState()
                 TextSwitch(
-                    title = "截屏服务",
-                    subtitle = "生成快照需要获取屏幕截图",
+                    title = getString(R.string.screenshot_service),
+                    subtitle = getString(R.string.screenshot_service_desc),
                     checked = screenshotRunning,
                     onCheckedChange = vm.viewModelScope.launchAsFn<Boolean> {
                         if (it) {
@@ -445,8 +446,8 @@ fun AdvancedPage() {
 
             val floatingRunning by FloatingService.isRunning.collectAsState()
             TextSwitch(
-                title = "悬浮窗服务",
-                subtitle = "显示悬浮按钮点击保存快照",
+                title = getString(R.string.floating_service),
+                subtitle = getString(R.string.floating_service_desc),
                 checked = floatingRunning,
                 onCheckedChange = vm.viewModelScope.launchAsFn<Boolean> {
                     if (it) {
@@ -461,8 +462,8 @@ fun AdvancedPage() {
             )
 
             TextSwitch(
-                title = "音量快照",
-                subtitle = "音量变化时保存快照",
+                title = getString(R.string.volume_snapshot),
+                subtitle = getString(R.string.volume_snapshot_desc),
                 checked = store.captureVolumeChange
             ) {
                 storeFlow.value = store.copy(
@@ -471,13 +472,13 @@ fun AdvancedPage() {
             }
 
             TextSwitch(
-                title = "截屏快照",
-                subtitle = "触发截屏时保存快照",
-                suffix = "查看限制",
+                title = getString(R.string.capture_screenshot),
+                subtitle = getString(R.string.capture_screenshot_desc),
+                suffix = getString(R.string.view_restrictions),
                 onSuffixClick = {
                     context.mainVm.dialogFlow.updateDialogOptions(
-                        title = "限制说明",
-                        text = "仅支持部分小米设备截屏触发\n\n只保存节点信息不保存图片, 用户需要在快照记录里替换截图",
+                        title = getString(R.string.restrictions),
+                        text = getString(R.string.capture_screenshot_tip),
                     )
                 },
                 checked = store.captureScreenshot
@@ -488,8 +489,8 @@ fun AdvancedPage() {
             }
 
             TextSwitch(
-                title = "隐藏状态栏",
-                subtitle = "隐藏截图顶部状态栏",
+                title = getString(R.string.hide_status_bar),
+                subtitle = getString(R.string.hide_status_bar_desc),
                 checked = store.hideSnapshotStatusBar
             ) {
                 storeFlow.value = store.copy(
@@ -498,8 +499,8 @@ fun AdvancedPage() {
             }
 
             TextSwitch(
-                title = "保存提示",
-                subtitle = "保存时提示\"正在保存快照\"",
+                title = getString(R.string.save_tips),
+                subtitle = getString(R.string.save_tips_desc),
                 checked = store.showSaveSnapshotToast
             ) {
                 storeFlow.value = store.copy(
@@ -508,9 +509,9 @@ fun AdvancedPage() {
             }
 
             SettingItem(
-                title = "Github Cookie",
-                subtitle = "生成快照/日志链接",
-                suffix = "获取教程",
+                title = getString(R.string.github_cookies),
+                subtitle = getString(R.string.github_cookies_desc),
+                suffix = getString(R.string.view_tutorial),
                 onSuffixClick = {
                     context.openUri("https://gkd.li/?r=1")
                 },
@@ -521,15 +522,15 @@ fun AdvancedPage() {
             )
 
             Text(
-                text = "界面记录",
+                text = getString(R.string.interface_record),
                 modifier = Modifier.titleItemPadding(),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
 
             TextSwitch(
-                title = "记录界面",
-                subtitle = "记录打开的应用及界面",
+                title = getString(R.string.record_interface),
+                subtitle = getString(R.string.record_interface_desc),
                 checked = store.enableActivityLog
             ) {
                 storeFlow.value = store.copy(
@@ -537,22 +538,22 @@ fun AdvancedPage() {
                 )
             }
             SettingItem(
-                title = "界面记录",
+                title = getString(R.string.interface_record),
                 onClick = {
                     navController.toDestinationsNavigator().navigate(ActivityLogPageDestination)
                 }
             )
 
             Text(
-                text = "日志",
+                text = getString(R.string.log),
                 modifier = Modifier.titleItemPadding(),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
 
             TextSwitch(
-                title = "保存日志",
-                subtitle = "保存7天日志,帮助定位BUG",
+                title = getString(R.string.save_log),
+                subtitle = getString(R.string.save_log_desc),
                 checked = store.log2FileSwitch,
                 onCheckedChange = {
                     storeFlow.value = store.copy(
@@ -565,7 +566,7 @@ fun AdvancedPage() {
                                 logFiles.forEach { f ->
                                     f.delete()
                                 }
-                                toast("已删除全部日志")
+                                toast(getString(R.string.all_logs_deleted))
                             }
                         }
                     }
@@ -573,7 +574,7 @@ fun AdvancedPage() {
 
             if (store.log2FileSwitch) {
                 SettingItem(
-                    title = "导出日志",
+                    title = getString(R.string.export_log),
                     imageVector = Icons.Default.Share,
                     onClick = {
                         showShareLogDlg = true
@@ -582,14 +583,14 @@ fun AdvancedPage() {
             }
 
             Text(
-                text = "其它",
+                text = getString(R.string.other),
                 modifier = Modifier.titleItemPadding(),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
 
-            TextSwitch(title = "前台悬浮窗",
-                subtitle = "添加透明悬浮窗,关闭可能导致不点击/点击缓慢",
+            TextSwitch(title = getString(R.string.enable_floating_window),
+                subtitle = getString(R.string.enable_floating_window_desc),
                 checked = store.enableAbFloatWindow,
                 onCheckedChange = {
                     storeFlow.value = store.copy(
@@ -606,8 +607,8 @@ fun AdvancedPage() {
 @Composable
 private fun ShizukuFragment(enabled: Boolean = true) {
     val store by storeFlow.collectAsState()
-    TextSwitch(title = "Shizuku-界面识别",
-        subtitle = "更准确识别界面ID",
+    TextSwitch(title = getString(R.string.shizuku_interface_recognition),
+        subtitle = getString(R.string.shizuku_interface_recognition_desc),
         checked = store.enableShizukuActivity,
         enabled = enabled,
         onCheckedChange = { enableShizuku ->
@@ -621,7 +622,7 @@ private fun ShizukuFragment(enabled: Boolean = true) {
                             enableShizukuActivity = true
                         )
                     } else {
-                        toast("Shizuku-界面识别校验失败,无法使用")
+                        toast(getString(R.string.shizuku_verification_failed))
                     }
                 }
             } else {
@@ -632,8 +633,8 @@ private fun ShizukuFragment(enabled: Boolean = true) {
         })
 
     TextSwitch(
-        title = "Shizuku-模拟点击",
-        subtitle = "变更 clickCenter 为强制模拟点击",
+        title = getString(R.string.shizuku_simulates_clicking),
+        subtitle = getString(R.string.shizuku_simulates_clicking_desc),
         checked = store.enableShizukuClick,
         enabled = enabled,
         onCheckedChange = { enableShizuku ->
@@ -645,7 +646,7 @@ private fun ShizukuFragment(enabled: Boolean = true) {
                     if (json.decodeFromString<CommandResult>(result).code == 0) {
                         storeFlow.update { it.copy(enableShizukuClick = true) }
                     } else {
-                        toast("Shizuku-模拟点击校验失败,无法使用")
+                        toast(getString(R.string.shizuku_verification_failed))
                     }
                 }
             } else {

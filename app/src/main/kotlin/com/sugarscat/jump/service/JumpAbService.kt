@@ -17,15 +17,8 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import com.sugarscat.jump.composition.CompositionAbService
 import com.sugarscat.jump.composition.CompositionExt.useLifeCycleLog
 import com.sugarscat.jump.composition.CompositionExt.useScope
@@ -53,6 +46,15 @@ import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.toast
 import com.sugarscat.selector.MatchOption
 import com.sugarscat.selector.Selector
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -422,7 +424,7 @@ class JumpAbService : CompositionAbService({
                             aliveView = tempView
                         } catch (e: Exception) {
                             LogUtils.d("创建无障碍悬浮窗失败", e)
-                            toast("创建无障碍悬浮窗失败")
+                            toast(getString(R.string.failed_to_create_accessible_floating_window))
                             storeFlow.update { store ->
                                 store.copy(enableAbFloatWindow = false)
                             }
@@ -450,7 +452,7 @@ class JumpAbService : CompositionAbService({
                     lastTriggerTime = t
                     scope.launchTry(Dispatchers.IO) {
                         SnapshotExt.captureSnapshot()
-                        toast("快照成功")
+                        toast(getString(R.string.snapshot_succeeded))
                     }
                 }
             }
@@ -488,9 +490,11 @@ class JumpAbService : CompositionAbService({
         if (!storeFlow.value.captureScreenshot) return@onAccessibilityEvent
         val appId = e.packageName ?: return@onAccessibilityEvent
         val appCls = e.className ?: return@onAccessibilityEvent
+        val screenshotThumbnailText = getString(R.string.screenshot_thumbnail)
         if (appId.contentEquals("com.miui.screenshot") && e.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && !e.isFullScreen && appCls.contentEquals(
                 "android.widget.RelativeLayout"
-            ) && e.text.firstOrNull()?.contentEquals("截屏缩略图") == true // [截屏缩略图, 截长屏, 发送]
+            ) && e.text.firstOrNull()
+                ?.contentEquals(screenshotThumbnailText) == true // [截屏缩略图, 截长屏, 发送]
         ) {
             LogUtils.d("captureScreenshot", e)
             scope.launchTry(Dispatchers.IO) {
@@ -525,8 +529,12 @@ class JumpAbService : CompositionAbService({
         val isRunning = MutableStateFlow(false)
 
         fun execAction(jumpAction: JumpAction): ActionResult {
-            val serviceVal = service ?: throw RpcError("无障碍没有运行")
-            val selector = Selector.parseOrNull(jumpAction.selector) ?: throw RpcError("非法选择器")
+            val accessibilityIsNotAvailableText = getString(R.string.accessibility_is_not_available)
+            val illegalSelectorText = getString(R.string.illegal_selector)
+            val noNodeFoundText = getString(R.string.no_node_found)
+            val serviceVal = service ?: throw RpcError(accessibilityIsNotAvailableText)
+            val selector =
+                Selector.parseOrNull(jumpAction.selector) ?: throw RpcError(illegalSelectorText)
             selector.checkSelector()?.let {
                 throw RpcError(it)
             }
@@ -538,7 +546,7 @@ class JumpAbService : CompositionAbService({
                 ),
                 createCacheTransform().transform,
                 isRootNode = true
-            ) ?: throw RpcError("没有查询到节点")
+            ) ?: throw RpcError(noNodeFoundText)
 
             if (jumpAction.action == null) {
                 // 仅查询

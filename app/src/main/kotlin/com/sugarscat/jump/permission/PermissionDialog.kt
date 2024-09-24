@@ -5,10 +5,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.yield
-import com.sugarscat.jump.MainActivity
 import kotlin.coroutines.coroutineContext
 
 data class AuthReason(
@@ -22,7 +24,7 @@ fun AuthDialog(authReasonFlow: MutableStateFlow<AuthReason?>) {
     if (authAction != null) {
         AlertDialog(
             title = {
-                Text(text = "权限请求")
+                Text(text = getString(R.string.permission_request))
             },
             text = {
                 Text(text = authAction.text)
@@ -33,12 +35,12 @@ fun AuthDialog(authReasonFlow: MutableStateFlow<AuthReason?>) {
                     authReasonFlow.value = null
                     authAction.confirm()
                 }) {
-                    Text(text = "确认")
+                    Text(text = getString(R.string.confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { authReasonFlow.value = null }) {
-                    Text(text = "取消")
+                    Text(text = getString(R.string.cancel))
                 }
             }
         )

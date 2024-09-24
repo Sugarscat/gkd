@@ -29,8 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.sugarscat.jump.R
 import com.sugarscat.jump.util.LocalNavController
 import com.sugarscat.jump.util.ProfileTransitions
 import com.sugarscat.jump.util.imageLoader
@@ -128,7 +130,7 @@ private fun UriImage(uri: String) {
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = "加载失败",
+                    text = getString(R.string.loading_failed),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium
                 )

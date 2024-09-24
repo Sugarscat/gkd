@@ -6,21 +6,22 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
+import com.blankj.utilcode.util.StringUtils.getString
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.updateAndGet
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import com.sugarscat.jump.R
 import com.sugarscat.jump.app
-import com.sugarscat.jump.appScope
 import com.sugarscat.jump.service.fixRestartService
 import com.sugarscat.jump.shizuku.newActivityTaskManager
 import com.sugarscat.jump.shizuku.safeGetTasks
 import com.sugarscat.jump.shizuku.shizukuIsSafeOK
 import com.sugarscat.jump.util.initOrResetAppInfoCache
 import com.sugarscat.jump.util.launchTry
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -40,7 +41,7 @@ class PermissionState(
 
 private fun checkSelfPermission(permission: String): Boolean {
     return ContextCompat.checkSelfPermission(
-        com.sugarscat.jump.app,
+        app,
         permission
     ) == PackageManager.PERMISSION_GRANTED
 }
@@ -72,18 +73,20 @@ private suspend fun asyncRequestPermission(
     }
 }
 
+val permissionSettingsText: String = getString(R.string.go_to_app_permission_settings)
+
 val notificationState by lazy {
     PermissionState(
         check = {
-            XXPermissions.isGranted(com.sugarscat.jump.app, Permission.NOTIFICATION_SERVICE)
+            XXPermissions.isGranted(app, Permission.NOTIFICATION_SERVICE)
         },
         request = {
             asyncRequestPermission(it, Permission.POST_NOTIFICATIONS)
         },
         reason = AuthReason(
-            text = "当前操作需要[通知权限]\n\n您需要前往应用权限设置打开此权限",
+            text = getString(R.string.notification_permission_required) + permissionSettingsText,
             confirm = {
-                XXPermissions.startPermissionActivity(com.sugarscat.jump.app, Permission.POST_NOTIFICATIONS)
+                XXPermissions.startPermissionActivity(app, Permission.POST_NOTIFICATIONS)
             }
         ),
     )
@@ -92,15 +95,15 @@ val notificationState by lazy {
 val canQueryPkgState by lazy {
     PermissionState(
         check = {
-            XXPermissions.isGranted(com.sugarscat.jump.app, Permission.GET_INSTALLED_APPS)
+            XXPermissions.isGranted(app, Permission.GET_INSTALLED_APPS)
         },
         request = {
             asyncRequestPermission(it, Permission.GET_INSTALLED_APPS)
         },
         reason = AuthReason(
-            text = "当前操作需要[读取应用列表权限]\n\n您需要前往应用权限设置打开此权限",
+            text = getString(R.string.get_installed_apps_permission_required) + permissionSettingsText,
             confirm = {
-                XXPermissions.startPermissionActivity(com.sugarscat.jump.app, Permission.GET_INSTALLED_APPS)
+                XXPermissions.startPermissionActivity(app, Permission.GET_INSTALLED_APPS)
             }
         ),
     )
@@ -109,20 +112,20 @@ val canQueryPkgState by lazy {
 val canDrawOverlaysState by lazy {
     PermissionState(
         check = {
-            Settings.canDrawOverlays(com.sugarscat.jump.app)
+            Settings.canDrawOverlays(app)
         },
         request = {
             // 无法直接请求悬浮窗权限
-            if (!Settings.canDrawOverlays(com.sugarscat.jump.app)) {
+            if (!Settings.canDrawOverlays(app)) {
                 PermissionResult.Denied(true)
             } else {
                 PermissionResult.Granted
             }
         },
         reason = AuthReason(
-            text = "当前操作需要[悬浮窗权限]\n\n您需要前往应用权限设置打开此权限",
+            text = getString(R.string.system_alert_window_permission_required) + permissionSettingsText,
             confirm = {
-                XXPermissions.startPermissionActivity(com.sugarscat.jump.app, Manifest.permission.SYSTEM_ALERT_WINDOW)
+                XXPermissions.startPermissionActivity(app, Manifest.permission.SYSTEM_ALERT_WINDOW)
             }
         ),
     )
@@ -145,10 +148,10 @@ val canWriteExternalStorage by lazy {
             }
         },
         reason = AuthReason(
-            text = "当前操作需要[写入外部存储权限]\n\n您需要前往应用权限设置打开此权限",
+            text = getString(R.string.write_external_storage_permission_required) + permissionSettingsText,
             confirm = {
                 XXPermissions.startPermissionActivity(
-                    com.sugarscat.jump.app,
+                    app,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             }

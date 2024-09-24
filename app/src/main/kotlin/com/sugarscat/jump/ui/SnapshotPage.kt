@@ -41,14 +41,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.ClipboardUtils
 import com.blankj.utilcode.util.ImageUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.blankj.utilcode.util.UriUtils
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.ImagePreviewPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.GithubPoliciesAsset
 import com.sugarscat.jump.data.Snapshot
 import com.sugarscat.jump.db.DbSet
@@ -68,6 +68,8 @@ import com.sugarscat.jump.util.shareFile
 import com.sugarscat.jump.util.snapshotZipDir
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Destination<RootGraph>(style = ProfileTransitions::class)
 @Composable
@@ -98,13 +100,21 @@ fun SnapshotPage() {
                     )
                 }
             },
-            title = { Text(text = if (snapshots.isEmpty()) "快照记录" else "快照记录-${snapshots.size}") },
+            title = {
+                Text(
+                    text =
+                    if (snapshots.isEmpty())
+                        getString(R.string.snapshot_record)
+                    else
+                        getString(R.string.snapshot_record) + "-${snapshots.size}"
+                )
+            },
             actions = {
                 if (snapshots.isNotEmpty()) {
                     IconButton(onClick = throttle(fn = vm.viewModelScope.launchAsFn(Dispatchers.IO) {
                         context.mainVm.dialogFlow.waitResult(
-                            title = "删除记录",
-                            text = "确定删除全部快照记录?",
+                            title = getString(R.string.delete_record),
+                            text = getString(R.string.delete_all_snapshot_records_tip),
                             error = true,
                         )
                         snapshots.forEach { s ->
@@ -167,7 +177,7 @@ fun SnapshotPage() {
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (snapshots.isEmpty()) {
-                    EmptyText(text = "暂无记录")
+                    EmptyText(text = getString(R.string.empty_record))
                 }
             }
         }
@@ -186,7 +196,7 @@ fun SnapshotPage() {
                     .fillMaxWidth()
                     .padding(16.dp)
                 Text(
-                    text = "查看", modifier = Modifier
+                    text = getString(R.string.check), modifier = Modifier
                         .clickable(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                             navController
                                 .toDestinationsNavigator()
@@ -202,7 +212,7 @@ fun SnapshotPage() {
                 )
                 HorizontalDivider()
                 Text(
-                    text = "分享到其他应用",
+                    text = getString(R.string.share_to_other_apps),
                     modifier = Modifier
                         .clickable(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                             selectedSnapshot = null
@@ -211,13 +221,13 @@ fun SnapshotPage() {
                                 snapshotVal.appId,
                                 snapshotVal.activityId
                             )
-                            context.shareFile(zipFile, "分享快照文件")
+                            context.shareFile(zipFile, getString(R.string.share_snapshot_files))
                         }))
                         .then(modifier)
                 )
                 HorizontalDivider()
                 Text(
-                    text = "保存到下载",
+                    text = getString(R.string.save_to_downloads),
                     modifier = Modifier
                         .clickable(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                             selectedSnapshot = null
@@ -233,17 +243,17 @@ fun SnapshotPage() {
                 HorizontalDivider()
                 if (snapshotVal.githubAssetId != null) {
                     Text(
-                        text = "复制链接", modifier = Modifier
+                        text = getString(R.string.copy_link), modifier = Modifier
                             .clickable(onClick = throttle {
                                 selectedSnapshot = null
                                 ClipboardUtils.copyText(IMPORT_SHORT_URL + snapshotVal.githubAssetId)
-                                toast("复制成功")
+                                toast(getString(R.string.copied))
                             })
                             .then(modifier)
                     )
                 } else {
                     Text(
-                        text = "生成链接(需科学上网)", modifier = Modifier
+                        text = getString(R.string.generate_link), modifier = Modifier
                             .clickable(onClick = throttle {
                                 selectedSnapshot = null
                                 vm.uploadOptions.startTask(
@@ -261,7 +271,7 @@ fun SnapshotPage() {
                 HorizontalDivider()
 
                 Text(
-                    text = "保存截图到相册",
+                    text = getString(R.string.save_to_album),
                     modifier = Modifier
                         .clickable(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                             requiredPermission(context, canWriteExternalStorage)
@@ -270,14 +280,14 @@ fun SnapshotPage() {
                                 Bitmap.CompressFormat.PNG,
                                 true
                             )
-                            toast("保存成功")
+                            toast(getString(R.string.saved))
                             selectedSnapshot = null
                         }))
                         .then(modifier)
                 )
                 HorizontalDivider()
                 Text(
-                    text = "替换截图(去除隐私)",
+                    text = getString(R.string.replace_screenshot),
                     modifier = Modifier
                         .clickable(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                             val uri = context.pickContentLauncher.launchForImageResult()
@@ -297,18 +307,18 @@ fun SnapshotPage() {
                                         DbSet.snapshotDao.deleteGithubAssetId(snapshotVal.id)
                                     }
                                 } else {
-                                    toast("截图尺寸不一致,无法替换")
+                                    toast(getString(R.string.screenshot_sizes_are_inconsistent))
                                     return@withContext
                                 }
                             }
-                            toast("替换成功")
+                            toast(getString(R.string.replace_success))
                             selectedSnapshot = null
                         }))
                         .then(modifier)
                 )
                 HorizontalDivider()
                 Text(
-                    text = "删除", modifier = Modifier
+                    text = getString(R.string.delete), modifier = Modifier
                         .clickable(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                             DbSet.snapshotDao.delete(snapshotVal)
                             withContext(Dispatchers.IO) {

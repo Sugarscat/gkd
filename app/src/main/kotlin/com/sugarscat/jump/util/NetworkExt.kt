@@ -1,5 +1,7 @@
 package com.sugarscat.jump.util
 
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import java.net.NetworkInterface
 
 fun getIpAddressInLocalNetwork(): List<String> {
@@ -7,7 +9,7 @@ fun getIpAddressInLocalNetwork(): List<String> {
         NetworkInterface.getNetworkInterfaces().asSequence()
     } catch (e: Exception) {
         // android.system.ErrnoException: getifaddrs failed: EACCES (Permission denied)
-        toast("获取host失败:" + e.message)
+        toast(getString(R.string.failed_to_obtain_host_info, e.message))
         return emptyList()
     }
     val localAddresses = networkInterfaces.flatMap {

@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import com.sugarscat.jump.ui.style.itemPadding
 import com.sugarscat.jump.util.throttle
 
@@ -38,7 +40,7 @@ fun AuthCard(
         }
         Spacer(modifier = Modifier.width(10.dp))
         OutlinedButton(onClick = throttle(fn = onAuthClick)) {
-            Text(text = "授权")
+            Text(text = getString(R.string.authorize))
         }
     }
 }

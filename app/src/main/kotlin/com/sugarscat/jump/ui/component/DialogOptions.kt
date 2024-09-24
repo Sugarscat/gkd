@@ -9,10 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
+import com.sugarscat.jump.util.throttle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.yield
-import com.sugarscat.jump.util.throttle
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -84,7 +86,7 @@ fun BuildDialog(stateFlow: MutableStateFlow<AlertDialogOptions?>) {
 fun MutableStateFlow<AlertDialogOptions?>.updateDialogOptions(
     title: String,
     text: String,
-    confirmText: String = "我知道了",
+    confirmText: String = getString(R.string.i_see),
     confirmAction: (() -> Unit)? = null,
     dismissText: String? = null,
     dismissAction: (() -> Unit)? = null,
@@ -103,14 +105,14 @@ fun MutableStateFlow<AlertDialogOptions?>.updateDialogOptions(
     )
 }
 
-const val DEFAULT_CONFIRM_TEXT = "确定"
-const val DEFAULT_DISMISS_TEXT = "取消"
+val defaultConfirmText: String = getString(R.string.confirm)
+val defaultDismissText: String = getString(R.string.cancel)
 
 private suspend fun MutableStateFlow<AlertDialogOptions?>.getResult(
     title: String,
     text: String,
-    confirmText: String = DEFAULT_CONFIRM_TEXT,
-    dismissText: String = DEFAULT_DISMISS_TEXT,
+    confirmText: String = defaultConfirmText,
+    dismissText: String = defaultDismissText,
     error: Boolean = false,
 ): Boolean {
     return suspendCoroutine { s ->
@@ -136,8 +138,8 @@ private suspend fun MutableStateFlow<AlertDialogOptions?>.getResult(
 suspend fun MutableStateFlow<AlertDialogOptions?>.waitResult(
     title: String,
     text: String,
-    confirmText: String = DEFAULT_CONFIRM_TEXT,
-    dismissText: String = DEFAULT_DISMISS_TEXT,
+    confirmText: String = defaultConfirmText,
+    dismissText: String = defaultDismissText,
     error: Boolean = false,
 ) {
     val r = getResult(

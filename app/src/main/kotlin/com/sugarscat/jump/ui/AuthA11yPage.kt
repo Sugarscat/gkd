@@ -34,11 +34,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.ClipboardUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.permission.shizukuOkState
 import com.sugarscat.jump.permission.writeSecureSettingsState
 import com.sugarscat.jump.service.JumpAbService
@@ -53,6 +53,8 @@ import com.sugarscat.jump.util.openA11ySettings
 import com.sugarscat.jump.util.openUri
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import rikka.shizuku.Shizuku
 import java.io.DataOutputStream
 
@@ -79,14 +81,14 @@ fun AuthA11yPage() {
                 )
             }
         }, title = {
-            Text(text = "授权状态")
+            Text(text = getString(R.string.authorization_status))
         }, actions = {})
     }) { contentPadding ->
         Column(
             modifier = Modifier.padding(contentPadding)
         ) {
             Text(
-                text = "选择一个授权模式进行操作",
+                text = getString(R.string.authorization_status_tip),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(itemHorizontalPadding)
             )
@@ -98,19 +100,19 @@ fun AuthA11yPage() {
             ) {
                 Text(
                     modifier = Modifier.padding(cardHorizontalPadding, 8.dp),
-                    text = "普通授权(简单)",
+                    text = getString(R.string.general_authorization),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
                     modifier = Modifier.padding(cardHorizontalPadding, 0.dp),
                     style = MaterialTheme.typography.bodyMedium,
-                    text = "1. 授予[无障碍权限]\n2. 无障碍服务关闭后需重新授权"
+                    text = getString(R.string.general_authorization_desc)
                 )
                 if (writeSecureSettings || a11yRunning) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         modifier = Modifier.padding(cardHorizontalPadding, 0.dp),
-                        text = "已持有[无障碍权限], 可继续使用",
+                        text = getString(R.string.already_have_accessibility_permission),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -122,7 +124,7 @@ fun AuthA11yPage() {
                     ) {
                         TextButton(onClick = throttle { openA11ySettings() }) {
                             Text(
-                                text = "手动授权",
+                                text = getString(R.string.manual_authorization),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -133,7 +135,7 @@ fun AuthA11yPage() {
                             .clickable {
                                 context.openUri("https://gkd.li/?r=2")
                             },
-                        text = "无法开启无障碍?",
+                        text = getString(R.string.unable_to_turn_on_accessibility),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -149,13 +151,13 @@ fun AuthA11yPage() {
             ) {
                 Text(
                     modifier = Modifier.padding(cardHorizontalPadding, 8.dp),
-                    text = "高级授权(推荐)",
+                    text = getString(R.string.advanced_authorization),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
                     modifier = Modifier.padding(cardHorizontalPadding, 0.dp),
                     style = MaterialTheme.typography.bodyMedium,
-                    text = "1. 授予[写入安全设置权限]\n2. 授权永久有效, 包含[无障碍权限]\n3. 应用重启后可自动打开无障碍服务\n4. 在通知栏快捷开关可快捷重启, 无感保活"
+                    text = getString(R.string.advanced_authorization_desc)
                 )
                 if (!writeSecureSettings) {
                     Row(
@@ -167,7 +169,7 @@ fun AuthA11yPage() {
                             context.grantPermissionByShizuku()
                         })) {
                             Text(
-                                text = "Shizuku授权",
+                                text = getString(R.string.shizuku_authorization),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -175,7 +177,7 @@ fun AuthA11yPage() {
                             grantPermissionByRoot()
                         })) {
                             Text(
-                                text = "ROOT授权",
+                                text = getString(R.string.root_authorization),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -183,7 +185,7 @@ fun AuthA11yPage() {
                             vm.showCopyDlgFlow.value = true
                         }) {
                             Text(
-                                text = "手动授权",
+                                text = getString(R.string.manual_authorization),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -192,7 +194,7 @@ fun AuthA11yPage() {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         modifier = Modifier.padding(cardHorizontalPadding, 0.dp),
-                        text = "已持有[写入安全设置权限], 优先使用此权限",
+                        text = getString(R.string.prefer_write_security_settings),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Row(
@@ -202,12 +204,15 @@ fun AuthA11yPage() {
                     ) {
                         TextButton(onClick = throttle {
                             context.mainVm.dialogFlow.updateDialogOptions(
-                                title = "无感保活",
-                                text = "添加通知栏快捷开关\n\n1. 下拉通知栏至[快捷开关]图标界面\n2. 找到名称为 ${com.sugarscat.jump.META.appName} 的快捷开关\n3. 添加此开关到通知面板 \n\n只要此快捷开关在通知面板可见\n无论是系统杀后台还是自身BUG崩溃\n简单下拉打开通知即可重启"
+                                title = getString(R.string.keep_alive_without_feeling),
+                                text = getString(
+                                    R.string.keep_alive_without_feeling_desc,
+                                    com.sugarscat.jump.META.appName
+                                )
                             )
                         }) {
                             Text(
-                                text = "无感保活",
+                                text = getString(R.string.keep_alive_without_feeling),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -221,10 +226,10 @@ fun AuthA11yPage() {
     if (showCopyDlg) {
         AlertDialog(
             onDismissRequest = { vm.showCopyDlgFlow.value = false },
-            title = { Text(text = "手动授权") },
+            title = { Text(text = getString(R.string.manual_authorization)) },
             text = {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "1. 有一台安装了 adb 的电脑\n\n2.手机开启调试模式后连接电脑授权调试\n\n3. 在电脑 cmd/pwsh 中运行如下命令")
+                    Text(text = getString(R.string.adb_authorization_desc))
                     Spacer(modifier = Modifier.height(4.dp))
                     SelectionContainer {
                         Text(
@@ -241,14 +246,14 @@ fun AuthA11yPage() {
                 TextButton(onClick = {
                     vm.showCopyDlgFlow.value = false
                     ClipboardUtils.copyText(commandText)
-                    toast("复制成功")
+                    toast(getString(R.string.copied))
                 }) {
-                    Text(text = "复制并关闭")
+                    Text(text = getString(R.string.copy_and_close))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { vm.showCopyDlgFlow.value = false }) {
-                    Text(text = "关闭")
+                    Text(text = getString(R.string.close))
                 }
             }
         )
@@ -269,19 +274,19 @@ private suspend fun MainActivity.grantPermissionByShizuku() {
                 )
                 delay(500)
                 if (writeSecureSettingsState.updateAndGet()) {
-                    toast("授权成功")
+                    toast(getString(R.string.authorization_success))
                     fixRestartService()
                 }
             }
         } catch (e: Exception) {
-            toast("授权失败:${e.message}")
+            toast(getString(R.string.authorization_failed_tip, e.message))
             LogUtils.d(e)
         }
     } else {
         try {
             Shizuku.requestPermission(Activity.RESULT_OK)
         } catch (e: Exception) {
-            LogUtils.d("Shizuku授权错误", e.message)
+            LogUtils.d("Shizuku 授权错误", e.message)
             mainVm.shizukuErrorFlow.value = true
         }
     }
@@ -299,10 +304,10 @@ private fun grantPermissionByRoot() {
         o.close()
         p.waitFor()
         if (p.exitValue() == 0) {
-            toast("授权成功")
+            toast(getString(R.string.authorization_success))
         }
     } catch (e: Exception) {
-        toast("授权失败:${e.message}")
+        toast(getString(R.string.authorization_failed_tip, e.message))
         LogUtils.d(e)
     } finally {
         p?.destroy()

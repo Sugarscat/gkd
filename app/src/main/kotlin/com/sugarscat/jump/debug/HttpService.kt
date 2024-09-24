@@ -4,30 +4,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import com.blankj.utilcode.util.LogUtils
-import io.ktor.http.ContentType
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.call
-import io.ktor.server.application.install
-import io.ktor.server.cio.CIO
-import io.ktor.server.cio.CIOApplicationEngine
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.request.receive
-import io.ktor.server.request.receiveText
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondFile
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.serialization.Serializable
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.AppInfo
 import com.sugarscat.jump.data.DeviceInfo
 import com.sugarscat.jump.data.JumpAction
@@ -52,6 +29,30 @@ import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.subsItemsFlow
 import com.sugarscat.jump.util.toast
 import com.sugarscat.jump.util.updateSubscription
+import io.ktor.http.ContentType
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.call
+import io.ktor.server.application.install
+import io.ktor.server.cio.CIO
+import io.ktor.server.cio.CIOApplicationEngine
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.receive
+import io.ktor.server.request.receiveText
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondFile
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.Serializable
 import java.io.File
 
 
@@ -70,18 +71,18 @@ class HttpService : Service() {
                 server = try {
                     createServer(port).apply { start() }
                 } catch (e: Exception) {
-                    LogUtils.d("HTTP服务启动失败", e)
+                    LogUtils.d(R.string.http_service_startup_failed, e)
                     null
                 }
                 if (server == null) {
-                    toast("HTTP服务启动失败,您可以尝试切换端口后重新启动")
+                    toast(R.string.http_service_startup_failed_retry.toString())
                     stopSelf()
                     return@collect
                 }
                 createNotif(
                     this@HttpService,
                     httpChannel.id,
-                    httpNotif.copy(text = "HTTP服务-端口$port")
+                    httpNotif.copy(text = getString(R.string.http_service_port, port))
                 )
             }
         }
@@ -171,7 +172,7 @@ private fun createServer(port: Int): CIOApplicationEngine {
                         ?: throw RpcError("miss id")
                     val fp = File(SnapshotExt.getSnapshotPath(id))
                     if (!fp.exists()) {
-                        throw RpcError("对应快照不存在")
+                        throw RpcError(R.string.snapshot_does_not_exist.toString())
                     }
                     call.respondFile(fp)
                 }
@@ -179,7 +180,7 @@ private fun createServer(port: Int): CIOApplicationEngine {
                     val data = call.receive<ReqId>()
                     val fp = File(SnapshotExt.getSnapshotPath(data.id))
                     if (!fp.exists()) {
-                        throw RpcError("对应快照不存在")
+                        throw RpcError(R.string.snapshot_does_not_exist.toString())
                     }
                     call.respond(fp)
                 }
@@ -190,7 +191,7 @@ private fun createServer(port: Int): CIOApplicationEngine {
                         ?: throw RpcError("miss id")
                     val fp = File(SnapshotExt.getScreenshotPath(id))
                     if (!fp.exists()) {
-                        throw RpcError("对应截图不存在")
+                        throw RpcError(R.string.screenshot_does_not_exist.toString())
                     }
                     call.respondFile(fp)
                 }
@@ -198,7 +199,7 @@ private fun createServer(port: Int): CIOApplicationEngine {
                     val data = call.receive<ReqId>()
                     val fp = File(SnapshotExt.getScreenshotPath(data.id))
                     if (!fp.exists()) {
-                        throw RpcError("对应截图不存在")
+                        throw RpcError(R.string.screenshot_does_not_exist.toString())
                     }
                     call.respondFile(fp)
                 }
@@ -235,7 +236,7 @@ private fun createServer(port: Int): CIOApplicationEngine {
                 }
                 post("/execSelector") {
                     if (!JumpAbService.isRunning.value) {
-                        throw RpcError("无障碍没有运行")
+                        throw RpcError(R.string.accessibility_is_not_available.toString())
                     }
                     val jumpAction = call.receive<JumpAction>()
                     call.respond(JumpAbService.execAction(jumpAction))

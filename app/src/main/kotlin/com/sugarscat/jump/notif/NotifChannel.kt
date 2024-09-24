@@ -1,5 +1,7 @@
 package com.sugarscat.jump.notif
 
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import com.sugarscat.jump.app
 
 data class NotifChannel(
@@ -10,29 +12,37 @@ data class NotifChannel(
 
 val defaultChannel by lazy {
     NotifChannel(
-        id = "default", name = "Jump", desc = "显示服务运行状态"
+        id = "default",
+        name = getString(R.string.app_service),
+        desc = getString(R.string.desc_app_service)
     )
 }
 
 val floatingChannel by lazy {
     NotifChannel(
-        id = "floating", name = "悬浮窗按钮服务", desc = "用于主动捕获屏幕快照的悬浮窗按钮"
+        id = "floating",
+        name = getString(R.string.floating_service),
+        desc = getString(R.string.dropzone_service_desc)
     )
 }
 val screenshotChannel by lazy {
     NotifChannel(
-        id = "screenshot", name = "截屏服务", desc = "用于捕获屏幕截屏生成快照"
+        id = "screenshot",
+        name = getString(R.string.screenshot_service),
+        desc = getString(R.string.screenshot_service_desc)
     )
 }
 val httpChannel by lazy {
     NotifChannel(
-        id = "http", name = "HTTP服务", desc = "用于连接Web端工具调试"
+        id = "http",
+        name = getString(R.string.http_service),
+        desc = getString(R.string.desc_http_service)
     )
 }
 
 fun initChannel() {
-    createChannel(com.sugarscat.jump.app, defaultChannel)
-    createChannel(com.sugarscat.jump.app, floatingChannel)
-    createChannel(com.sugarscat.jump.app, screenshotChannel)
-    createChannel(com.sugarscat.jump.app, httpChannel)
+    createChannel(app, defaultChannel)
+    createChannel(app, floatingChannel)
+    createChannel(app, screenshotChannel)
+    createChannel(app, httpChannel)
 }

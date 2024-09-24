@@ -12,6 +12,7 @@ import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import com.blankj.utilcode.util.LogUtils
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.permission.canWriteExternalStorage
 import com.sugarscat.jump.permission.requiredPermission
 import kotlinx.coroutines.Dispatchers
@@ -51,14 +52,14 @@ suspend fun MainActivity.saveFileToDownloads(file: File) {
         }
         withContext(Dispatchers.IO) {
             val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
-                ?: error("创建URI失败")
+                ?: error(getString(R.string.failed_to_create_uri))
             contentResolver.openOutputStream(uri)?.use { outputStream ->
                 outputStream.write(file.readBytes())
                 outputStream.flush()
             }
         }
     }
-    toast("已保存 ${file.name} 到下载")
+    toast(getString(R.string.saved_file_to_downloads, file.name))
 }
 
 fun Context.tryStartActivity(intent: Intent) {
@@ -83,7 +84,7 @@ fun Context.openUri(uri: String) {
         Uri.parse(uri)
     } catch (e: Exception) {
         e.printStackTrace()
-        toast("非法链接")
+        toast(getString(R.string.illegal_link))
         return
     }
     val intent = Intent(Intent.ACTION_VIEW, u)
@@ -97,6 +98,6 @@ fun Context.openApp(appId: String) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         tryStartActivity(intent)
     } else {
-        toast("请检查此应用是否安装")
+        toast(getString(R.string.app_not_installed))
     }
 }

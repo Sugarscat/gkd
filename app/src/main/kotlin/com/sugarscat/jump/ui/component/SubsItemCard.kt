@@ -37,12 +37,13 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.ClipboardUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.generated.destinations.CategoryPageDestination
 import com.ramcosta.composedestinations.generated.destinations.GlobalRulePageDestination
 import com.ramcosta.composedestinations.generated.destinations.SubsPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.Dispatchers
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsItem
 import com.sugarscat.jump.data.deleteSubscription
@@ -58,6 +59,7 @@ import com.sugarscat.jump.util.subsRefreshErrorsFlow
 import com.sugarscat.jump.util.subsRefreshingFlow
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.Dispatchers
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -182,14 +184,15 @@ fun SubsItemCard(
                     }
                     Text(
                         text = subsLoadError?.message
-                            ?: if (subsRefreshing) "加载中..." else "文件不存在",
+                            ?: if (subsRefreshing) getString(R.string.loading)
+                            else getString(R.string.file_does_not_exist),
                         style = MaterialTheme.typography.bodyMedium,
                         color = color
                     )
                 }
                 if (subsRefreshError != null) {
                     Text(
-                        text = "加载错误: ${subsRefreshError?.message}",
+                        text = getString(R.string.loading_error) + "${subsRefreshError?.message}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -233,7 +236,7 @@ private fun SubsMenuItem(
             if (subItem.id < 0 || subscription.apps.isNotEmpty()) {
                 DropdownMenuItem(
                     text = {
-                        Text(text = "应用规则")
+                        Text(text = getString(R.string.app_rules))
                     },
                     onClick = throttle {
                         onExpandedChange(false)
@@ -245,7 +248,7 @@ private fun SubsMenuItem(
             if (subItem.id < 0 || subscription.categories.isNotEmpty()) {
                 DropdownMenuItem(
                     text = {
-                        Text(text = "规则类别")
+                        Text(text = getString(R.string.rule_category))
                     },
                     onClick = throttle {
                         onExpandedChange(false)
@@ -257,7 +260,7 @@ private fun SubsMenuItem(
             if (subItem.id < 0 || subscription.globalGroups.isNotEmpty()) {
                 DropdownMenuItem(
                     text = {
-                        Text(text = "全局规则")
+                        Text(text = getString(R.string.global_rules))
                     },
                     onClick = throttle {
                         onExpandedChange(false)
@@ -270,7 +273,7 @@ private fun SubsMenuItem(
         subscription?.supportUri?.let { supportUri ->
             DropdownMenuItem(
                 text = {
-                    Text(text = "问题反馈")
+                    Text(text = getString(R.string.problem_feedback))
                 },
                 onClick = {
                     onExpandedChange(false)
@@ -280,7 +283,7 @@ private fun SubsMenuItem(
         }
         DropdownMenuItem(
             text = {
-                Text(text = "导出数据")
+                Text(text = getString(R.string.export_data))
             },
             onClick = {
                 onExpandedChange(false)
@@ -292,17 +295,17 @@ private fun SubsMenuItem(
         subItem.updateUrl?.let {
             DropdownMenuItem(
                 text = {
-                    Text(text = "复制链接")
+                    Text(text = getString(R.string.copy_link))
                 },
                 onClick = {
                     onExpandedChange(false)
                     ClipboardUtils.copyText(subItem.updateUrl)
-                    toast("复制成功")
+                    toast(getString(R.string.copied))
                 }
             )
             DropdownMenuItem(
                 text = {
-                    Text(text = "修改链接")
+                    Text(text = getString(R.string.modify_link))
                 },
                 onClick = {
                     onExpandedChange(false)
@@ -323,8 +326,11 @@ private fun SubsMenuItem(
                     onExpandedChange(false)
                     vm.viewModelScope.launchTry {
                         context.mainVm.dialogFlow.waitResult(
-                            title = "删除订阅",
-                            text = "确定删除 ${subscription?.name ?: subItem.id} ?",
+                            title = getString(R.string.delete_subscription),
+                            text = getString(
+                                R.string.delete_subscription_tip,
+                                subscription?.name ?: subItem.id
+                            ),
                             error = true,
                         )
                         deleteSubscription(subItem.id)

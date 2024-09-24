@@ -56,13 +56,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.ClipboardUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.GlobalRuleExcludePageDestination
 import com.ramcosta.composedestinations.generated.destinations.ImagePreviewPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.Dispatchers
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsConfig
 import com.sugarscat.jump.db.DbSet
@@ -79,6 +80,7 @@ import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
 import com.sugarscat.jump.util.updateSubscription
+import kotlinx.coroutines.Dispatchers
 import li.songe.json5.encodeToJson5String
 
 @Destination<RootGraph>(style = ProfileTransitions::class)
@@ -122,7 +124,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
             }, title = {
                 TowLineText(
                     title = rawSubs?.name ?: subsItemId.toString(),
-                    subTitle = "全局规则"
+                    subTitle = getString(R.string.global_rules)
                 )
             })
         },
@@ -176,7 +178,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                                 )
                             } else {
                                 Text(
-                                    text = "暂无描述",
+                                    text = getString(R.string.no_desc),
                                     modifier = Modifier.fillMaxWidth(),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -184,7 +186,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                             }
                         } else {
                             Text(
-                                text = "非法选择器",
+                                text = getString(R.string.illegal_selector),
                                 modifier = Modifier.fillMaxWidth(),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error
@@ -212,19 +214,19 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                         ) {
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "复制")
+                                    Text(text = getString(R.string.copy))
                                 },
                                 onClick = {
                                     expanded = false
                                     val groupAppText = json.encodeToJson5String(group)
                                     ClipboardUtils.copyText(groupAppText)
-                                    toast("复制成功")
+                                    toast(getString(R.string.copied))
                                 }
                             )
                             if (editable) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(text = "编辑")
+                                        Text(text = getString(R.string.edit))
                                     },
                                     onClick = {
                                         expanded = false
@@ -234,7 +236,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                             }
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "编辑禁用")
+                                    Text(text = getString(R.string.edit_disabled))
                                 },
                                 onClick = throttle {
                                     expanded = false
@@ -249,14 +251,20 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                             if (editable && rawSubs != null) {
                                 DropdownMenuItem(
                                     text = {
-                                        Text(text = "删除", color = MaterialTheme.colorScheme.error)
+                                        Text(
+                                            text = getString(R.string.delete),
+                                            color = MaterialTheme.colorScheme.error
+                                        )
                                     },
                                     onClick = {
                                         expanded = false
                                         vm.viewModelScope.launchTry {
                                             context.mainVm.dialogFlow.waitResult(
-                                                title = "删除规则组",
-                                                text = "确定删除 ${group.name} ?",
+                                                title = getString(R.string.delete_rule_group),
+                                                text = getString(
+                                                    R.string.confirm_deletion_tip,
+                                                    group.name
+                                                ),
                                                 error = true,
                                             )
                                             updateSubscription(
@@ -298,7 +306,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (globalGroups.isEmpty()) {
-                    EmptyText(text = "暂无规则")
+                    EmptyText(text = getString(R.string.no_rules))
                 } else if (editable) {
                     Spacer(modifier = Modifier.height(EmptyHeight))
                 }
@@ -310,12 +318,12 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
         var source by remember {
             mutableStateOf("")
         }
-        AlertDialog(title = { Text(text = "添加全局规则组") }, text = {
+        AlertDialog(title = { Text(text = getString(R.string.add_global_rule_group)) }, text = {
             OutlinedTextField(
                 value = source,
                 onValueChange = { source = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = "请输入规则组") },
+                placeholder = { Text(text = getString(R.string.input_rule_group)) },
                 maxLines = 10,
             )
         }, onDismissRequest = {
@@ -327,7 +335,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                 val newGroup = try {
                     RawSubscription.parseRawGlobalGroup(source)
                 } catch (e: Exception) {
-                    toast("非法规则\n${e.message ?: e}")
+                    toast(getString(R.string.illegal_rule_tip, e.message ?: e))
                     return@TextButton
                 }
                 if (newGroup.errorDesc != null) {
@@ -335,7 +343,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                     return@TextButton
                 }
                 if (rawSubs.globalGroups.any { g -> g.name == newGroup.name }) {
-                    toast("存在同名规则[${newGroup.name}]")
+                    toast(getString(R.string.has_same_rule_name, newGroup.name))
                     return@TextButton
                 }
                 val newKey = (rawSubs.globalGroups.maxByOrNull { g -> g.key }?.key ?: -1) + 1
@@ -346,14 +354,14 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                 updateSubscription(newRawSubs)
                 vm.viewModelScope.launchTry(Dispatchers.IO) {
                     showAddDlg = false
-                    toast("添加成功")
+                    toast(getString(R.string.add_success))
                 }
             }, enabled = source.isNotEmpty()) {
-                Text(text = "添加")
+                Text(text = getString(R.string.add))
             }
         }, dismissButton = {
             TextButton(onClick = { showAddDlg = false }) {
-                Text(text = "取消")
+                Text(text = getString(R.string.cancel))
             }
         })
     }
@@ -368,7 +376,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
             ) {
 
                 if (editable) {
-                    Text(text = "删除规则组", modifier = Modifier
+                    Text(text = getString(R.string.delete_rule_group), modifier = Modifier
                         .clickable {
                             setMenuGroupRaw(null)
 
@@ -388,7 +396,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
         val focusRequester = remember { FocusRequester() }
         val oldSource = remember { source }
         AlertDialog(
-            title = { Text(text = "编辑规则组") },
+            title = { Text(text = getString(R.string.edit_rule_group)) },
             text = {
                 OutlinedTextField(
                     value = source,
@@ -396,7 +404,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    placeholder = { Text(text = "请输入规则组") },
+                    placeholder = { Text(text = getString(R.string.input_rule_group)) },
                     maxLines = 10,
                 )
                 LaunchedEffect(null) {
@@ -410,25 +418,25 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
             },
             dismissButton = {
                 TextButton(onClick = { setEditGroupRaw(null) }) {
-                    Text(text = "取消")
+                    Text(text = getString(R.string.cancel))
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     if (oldSource == source) {
                         setEditGroupRaw(null)
-                        toast("规则无变动")
+                        toast(getString(R.string.rule_no_change))
                         return@TextButton
                     }
                     val newGroupRaw = try {
                         RawSubscription.parseRawGlobalGroup(source)
                     } catch (e: Exception) {
                         LogUtils.d(e)
-                        toast("非法规则:${e.message}")
+                        toast(getString(R.string.illegal_rule_tip, e.message))
                         return@TextButton
                     }
                     if (newGroupRaw.key != editGroupRaw.key) {
-                        toast("不能更改规则组的key")
+                        toast(getString(R.string.rule_group_key_cannot_change))
                         return@TextButton
                     }
                     if (newGroupRaw.errorDesc != null) {
@@ -445,10 +453,10 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                     updateSubscription(rawSubs.copy(globalGroups = newGlobalGroups))
                     vm.viewModelScope.launchTry(Dispatchers.IO) {
                         DbSet.subsItemDao.updateMtime(rawSubs.id)
-                        toast("更新成功")
+                        toast(getString(R.string.update_success))
                     }
                 }, enabled = source.isNotEmpty()) {
-                    Text(text = "更新")
+                    Text(text = getString(R.string.update))
                 }
             },
         )
@@ -458,7 +466,7 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
         AlertDialog(
             onDismissRequest = { setShowGroupItem(null) },
             title = {
-                Text(text = "规则组详情")
+                Text(text = getString(R.string.rule_group_details))
             },
             text = {
                 Column {
@@ -478,13 +486,13 @@ fun GlobalRulePage(subsItemId: Long, focusGroupKey: Int? = null) {
                             )
                         )
                     }) {
-                        Text(text = "查看图片")
+                        Text(text = getString(R.string.view_pictures))
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { setShowGroupItem(null) }) {
-                    Text(text = "关闭")
+                    Text(text = getString(R.string.close))
                 }
             }
         )

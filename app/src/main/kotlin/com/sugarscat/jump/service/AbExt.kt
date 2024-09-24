@@ -6,6 +6,8 @@ import android.util.LruCache
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import com.sugarscat.selector.Context
 import com.sugarscat.selector.FastQuery
 import com.sugarscat.selector.MatchOption
@@ -161,15 +163,32 @@ fun Selector.checkSelector(): String? {
         )
     }
     return when (error) {
-        is MismatchExpressionTypeException -> "不匹配表达式类型:${error.exception.stringify()}"
-        is MismatchOperatorTypeException -> "不匹配操作符类型:${error.exception.stringify()}"
-        is MismatchParamTypeException -> "不匹配参数类型:${error.call.stringify()}"
-        is UnknownIdentifierException -> "未知属性:${error.value.stringify()}"
-        is UnknownIdentifierMethodException -> "未知方法:${error.value.stringify()}"
-        is UnknownMemberException -> "未知属性:${error.value.stringify()}"
-        is UnknownMemberMethodException -> "未知方法:${error.value.stringify()}"
-        is UnknownIdentifierMethodParamsException -> "未知方法参数:${error.value.stringify()}"
-        is UnknownMemberMethodParamsException -> "未知方法参数:${error.value.stringify()}"
+        is MismatchExpressionTypeException ->
+            getString(R.string.does_not_match_expression_type) + ":${error.exception.stringify()}"
+
+        is MismatchOperatorTypeException ->
+            getString(R.string.does_not_match_operator_type) + ":${error.exception.stringify()}"
+
+        is MismatchParamTypeException ->
+            getString(R.string.does_not_match_parameter_type) + ":${error.call.stringify()}"
+
+        is UnknownIdentifierException ->
+            getString(R.string.unknown_attribute) + ":${error.value.stringify()}"
+
+        is UnknownIdentifierMethodException ->
+            getString(R.string.unknown_method) + ":${error.value.stringify()}"
+
+        is UnknownMemberException ->
+            getString(R.string.unknown_attribute) + ":${error.value.stringify()}"
+
+        is UnknownMemberMethodException ->
+            getString(R.string.unknown_method) + ":${error.value.stringify()}"
+
+        is UnknownIdentifierMethodParamsException ->
+            getString(R.string.unknown_method_parameters) + ":${error.value.stringify()}"
+
+        is UnknownMemberMethodParamsException ->
+            getString(R.string.unknown_method_parameters) + ":${error.value.stringify()}"
     }
 }
 

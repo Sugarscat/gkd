@@ -21,7 +21,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
+import com.blankj.utilcode.util.StringUtils.getString
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.permission.canQueryPkgState
 import com.sugarscat.jump.permission.requiredPermission
 import com.sugarscat.jump.ui.style.EmptyHeight
@@ -46,7 +48,7 @@ fun QueryPkgAuthCard() {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "如需显示所有应用\n请授予[读取应用列表权限]",
+                text = getString(R.string.show_apps_list_tip),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -54,7 +56,7 @@ fun QueryPkgAuthCard() {
             TextButton(onClick = throttle(fn = context.mainVm.viewModelScope.launchAsFn {
                 requiredPermission(context, canQueryPkgState)
             })) {
-                Text(text = "申请权限")
+                Text(text = getString(R.string.apply_for_permission))
             }
         }
     } else {

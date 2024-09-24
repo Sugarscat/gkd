@@ -3,6 +3,8 @@ package com.sugarscat.jump.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
 import com.sugarscat.jump.appScope
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsItem
@@ -77,7 +79,7 @@ class HomeVm : ViewModel() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 LogUtils.d(e)
-                toast("下载订阅文件失败")
+                toast(getString(R.string.failed_to_download_subscription_file))
                 return@launchTry
             }
             val newSubsRaw = try {
@@ -85,22 +87,22 @@ class HomeVm : ViewModel() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 LogUtils.d(e)
-                toast("解析订阅文件失败")
+                toast(getString(R.string.failed_to_parse_subscription_file))
                 return@launchTry
             }
             if (oldItem == null) {
                 if (subItems.any { it.id == newSubsRaw.id }) {
-                    toast("订阅已存在")
+                    toast(getString(R.string.subscription_already_exists))
                     return@launchTry
                 }
             } else {
                 if (oldItem.id != newSubsRaw.id) {
-                    toast("订阅id不对应")
+                    toast(getString(R.string.subscription_id_does_not_correspond))
                     return@launchTry
                 }
             }
             if (newSubsRaw.id < 0) {
-                toast("订阅id不可为${newSubsRaw.id}\n负数id为内部使用")
+                toast(getString(R.string.subscription_id_cannot_be_negative, newSubsRaw.id))
                 return@launchTry
             }
             val newItem = oldItem?.copy(updateUrl = url) ?: SubsItem(
@@ -111,10 +113,10 @@ class HomeVm : ViewModel() {
             updateSubscription(newSubsRaw)
             if (oldItem == null) {
                 DbSet.subsItemDao.insert(newItem)
-                toast("成功添加订阅")
+                toast(getString(R.string.subscription_added_successfully))
             } else {
                 DbSet.subsItemDao.update(newItem)
-                toast("成功修改订阅")
+                toast(getString(R.string.subscription_modified_successfully))
             }
         } finally {
             subsRefreshingFlow.value = false

@@ -19,6 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.NetworkUtils
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.MainViewModel
+import com.sugarscat.jump.R
 import io.ktor.client.call.body
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
@@ -31,10 +35,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import com.sugarscat.jump.META
-import com.sugarscat.jump.MainActivity
-import com.sugarscat.jump.MainViewModel
-import com.sugarscat.jump.app
 import java.io.File
 import java.net.URI
 
@@ -68,7 +68,7 @@ suspend fun UpdateStatus.checkUpdate(): NewVersion? {
     if (checkUpdatingFlow.value) return null
     val isAvailable = withContext(Dispatchers.IO) { NetworkUtils.isAvailable() }
     if (!isAvailable) {
-        error("网络不可用")
+        error(getString(R.string.network_unavailable))
     }
     checkUpdatingFlow.value = true
     try {
@@ -128,7 +128,7 @@ fun UpgradeDialog(status: UpdateStatus) {
     val newVersion by status.newVersionFlow.collectAsState()
     newVersion?.let { newVersionVal ->
         AlertDialog(title = {
-            Text(text = "新版本")
+            Text(text = getString(R.string.new_version))
         }, text = {
             Text(text = "v${com.sugarscat.jump.META.versionName} -> v${newVersionVal.versionName}\n\n${
                 if (newVersionVal.versionLogs.size > 1) {
@@ -149,11 +149,11 @@ fun UpgradeDialog(status: UpdateStatus) {
                 status.newVersionFlow.value = null
                 status.startDownload(context.mainVm, newVersionVal)
             }) {
-                Text(text = "下载更新")
+                Text(text = getString(R.string.download_update))
             }
         }, dismissButton = {
             TextButton(onClick = { status.newVersionFlow.value = null }) {
-                Text(text = "取消")
+                Text(text = getString(R.string.cancel))
             }
         })
     }
@@ -163,7 +163,7 @@ fun UpgradeDialog(status: UpdateStatus) {
         when (downloadStatusVal) {
             is LoadStatus.Loading -> {
                 AlertDialog(
-                    title = { Text(text = "下载中") },
+                    title = { Text(text = getString(R.string.downloading)) },
                     text = {
                         LinearProgressIndicator(
                             progress = { downloadStatusVal.progress },
@@ -173,10 +173,10 @@ fun UpgradeDialog(status: UpdateStatus) {
                     confirmButton = {
                         TextButton(onClick = {
                             status.downloadStatusFlow.value = LoadStatus.Failure(
-                                Exception("终止下载")
+                                Exception(getString(R.string.terminate_download))
                             )
                         }) {
-                            Text(text = "终止下载")
+                            Text(text = getString(R.string.terminate_download))
                         }
                     },
                 )
@@ -184,7 +184,7 @@ fun UpgradeDialog(status: UpdateStatus) {
 
             is LoadStatus.Failure -> {
                 AlertDialog(
-                    title = { Text(text = "下载失败") },
+                    title = { Text(text = getString(R.string.download_failed)) },
                     text = {
                         Text(text = downloadStatusVal.exception.let {
                             it.message ?: it.toString()
@@ -195,7 +195,7 @@ fun UpgradeDialog(status: UpdateStatus) {
                         TextButton(onClick = {
                             status.downloadStatusFlow.value = null
                         }) {
-                            Text(text = "关闭")
+                            Text(text = getString(R.string.close))
                         }
                     },
                 )
@@ -203,23 +203,23 @@ fun UpgradeDialog(status: UpdateStatus) {
 
             is LoadStatus.Success -> {
                 AlertDialog(
-                    title = { Text(text = "下载完毕") },
+                    title = { Text(text = getString(R.string.download_completed)) },
                     text = {
-                        Text(text = "可继续选择安装新版本")
+                        Text(text = getString(R.string.install_new_version_tip))
                     },
                     onDismissRequest = {},
                     dismissButton = {
                         TextButton(onClick = {
                             status.downloadStatusFlow.value = null
                         }) {
-                            Text(text = "关闭")
+                            Text(text = getString(R.string.close))
                         }
                     },
                     confirmButton = {
                         TextButton(onClick = throttle {
                             installApk(downloadStatusVal.result)
                         }) {
-                            Text(text = "安装")
+                            Text(text = getString(R.string.install))
                         }
                     })
             }

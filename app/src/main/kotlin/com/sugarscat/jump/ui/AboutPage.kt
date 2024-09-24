@@ -21,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.sugarscat.jump.META
+import com.sugarscat.jump.R
 import com.sugarscat.jump.ui.style.EmptyHeight
 import com.sugarscat.jump.ui.style.itemPadding
 import com.sugarscat.jump.util.LocalNavController
@@ -53,7 +55,7 @@ fun AboutPage() {
                         )
                     }
                 },
-                title = { Text(text = "关于") }
+                title = { Text(text = getString(R.string.about)) }
             )
         }
     ) { contentPadding ->
@@ -72,7 +74,7 @@ fun AboutPage() {
                     .itemPadding()
             ) {
                 Text(
-                    text = "开源地址",
+                    text = getString(R.string.open_source_address),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
@@ -87,11 +89,11 @@ fun AboutPage() {
                     .itemPadding()
             ) {
                 Text(
-                    text = "版本代码",
+                    text = getString(R.string.version_code),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
-                    text = com.sugarscat.jump.META.versionCode.toString(),
+                    text = META.versionCode.toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -102,11 +104,11 @@ fun AboutPage() {
                     .itemPadding()
             ) {
                 Text(
-                    text = "版本名称",
+                    text = getString(R.string.version_name),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
-                    text = com.sugarscat.jump.META.versionName,
+                    text = META.versionName,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -114,17 +116,17 @@ fun AboutPage() {
             Column(
                 modifier = Modifier
                     .clickable {
-                        context.openUri(com.sugarscat.jump.META.commitUrl)
+                        context.openUri(META.commitUrl)
                     }
                     .fillMaxWidth()
                     .itemPadding()
             ) {
                 Text(
-                    text = "代码记录",
+                    text = getString(R.string.commit_id),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
-                    text = com.sugarscat.jump.META.commitId,
+                    text = META.commitId,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -135,11 +137,11 @@ fun AboutPage() {
                     .itemPadding()
             ) {
                 Text(
-                    text = "提交时间",
+                    text = getString(R.string.commit_time),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
-                    text = com.sugarscat.jump.META.commitTime.format("yyyy-MM-dd HH:mm:ss ZZ"),
+                    text = META.commitTime.format("yyyy-MM-dd HH:mm:ss ZZ"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -151,11 +153,11 @@ fun AboutPage() {
                     .itemPadding()
             ) {
                 Text(
-                    text = "构建渠道",
+                    text = getString(R.string.build_channel),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Text(
-                    text = com.sugarscat.jump.META.channel,
+                    text = META.channel,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

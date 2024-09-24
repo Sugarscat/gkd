@@ -3,6 +3,7 @@ package com.sugarscat.jump.service
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
+import com.sugarscat.jump.R
 import com.sugarscat.jump.composition.CompositionExt.useLifeCycleLog
 import com.sugarscat.jump.composition.CompositionExt.useScope
 import com.sugarscat.jump.composition.CompositionService
@@ -32,8 +33,8 @@ class ManageService : CompositionService({
             ruleSummaryFlow,
             actionCountFlow,
         ) { abRunning, store, ruleSummary, count ->
-            if (!abRunning) return@combine "无障碍未授权"
-            if (!store.enableMatch) return@combine "暂停规则匹配"
+            if (!abRunning) return@combine getString(R.string.accessibility_is_not_available)
+            if (!store.enableMatch) return@combine getString(R.string.pause_rule_matching)
             if (store.useCustomNotIfText) {
                 return@combine store.customNotIfText
                     .replace("\${i}", ruleSummary.globalGroups.size.toString())

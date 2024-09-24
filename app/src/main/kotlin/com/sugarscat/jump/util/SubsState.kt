@@ -2,6 +2,17 @@ package com.sugarscat.jump.util
 
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.NetworkUtils
+import com.blankj.utilcode.util.StringUtils.getString
+import com.sugarscat.jump.R
+import com.sugarscat.jump.appScope
+import com.sugarscat.jump.data.AppRule
+import com.sugarscat.jump.data.CategoryConfig
+import com.sugarscat.jump.data.GlobalRule
+import com.sugarscat.jump.data.RawSubscription
+import com.sugarscat.jump.data.SubsConfig
+import com.sugarscat.jump.data.SubsItem
+import com.sugarscat.jump.data.SubsVersion
+import com.sugarscat.jump.db.DbSet
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.collections.immutable.ImmutableList
@@ -23,21 +34,12 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
-import com.sugarscat.jump.appScope
-import com.sugarscat.jump.data.AppRule
-import com.sugarscat.jump.data.CategoryConfig
-import com.sugarscat.jump.data.GlobalRule
-import com.sugarscat.jump.data.RawSubscription
-import com.sugarscat.jump.data.SubsConfig
-import com.sugarscat.jump.data.SubsItem
-import com.sugarscat.jump.data.SubsVersion
-import com.sugarscat.jump.db.DbSet
 import li.songe.json5.decodeFromJson5String
 import java.net.URI
 
 val subsItemsFlow by lazy {
     DbSet.subsItemDao.query().map { s -> s.toImmutableList() }
-        .stateIn(com.sugarscat.jump.appScope, SharingStarted.Eagerly, persistentListOf())
+        .stateIn(appScope, SharingStarted.Eagerly, persistentListOf())
 }
 
 data class SubsEntry(
@@ -71,13 +73,13 @@ val subsEntriesFlow by lazy {
                 subscription = subsIdToRaw[s.id],
             )
         }.toImmutableList()
-    }.stateIn(com.sugarscat.jump.appScope, SharingStarted.Eagerly, persistentListOf())
+    }.stateIn(appScope, SharingStarted.Eagerly, persistentListOf())
 }
 
 
 private val updateSubsFileMutex by lazy { Mutex() }
 fun updateSubscription(subscription: RawSubscription) {
-    com.sugarscat.jump.appScope.launchTry {
+    appScope.launchTry {
         updateSubsFileMutex.withLock {
             val newMap = subsIdToRawFlow.value.toMutableMap()
             if (subscription.id < 0 && newMap[subscription.id]?.version == subscription.version) {
@@ -135,23 +137,12 @@ data class RuleSummary(
     val appSize = appIdToRules.keys.size
     val appGroupSize = appIdToGroups.values.sumOf { s -> s.size }
 
-    val numText = if (globalGroups.size + appGroupSize > 0) {
-        if (globalGroups.isNotEmpty()) {
-            "${globalGroups.size}全局" + if (appGroupSize > 0) {
-                "/"
-            } else {
-                ""
-            }
+    val numText: String =
+        if (globalGroups.size + appGroupSize > 0) {
+            getString(R.string.global_app_rule, globalGroups, appSize, appGroupSize)
         } else {
-            ""
-        } + if (appGroupSize > 0) {
-            "${appSize}应用/${appGroupSize}规则组"
-        } else {
-            ""
+            getString(R.string.no_rules)
         }
-    } else {
-        "暂无规则"
-    }
 
     val slowGlobalGroups =
         globalRules.filter { r -> r.isSlow }.distinctBy { r -> r.group }
@@ -191,7 +182,7 @@ val ruleSummaryFlow by lazy {
                 mutableMapOf<RawSubscription.RawGlobalGroup, List<GlobalRule>>()
             rawSubs.globalGroups.filter { g ->
                 (subGlobalSubsConfigs.find { c -> c.groupKey == g.key }?.enable
-                        ?: g.enable ?: true) && g.valid
+                    ?: g.enable ?: true) && g.valid
             }.forEach { groupRaw ->
                 val config = subGlobalSubsConfigs.find { c -> c.groupKey == groupRaw.key }
                 val g = ResolvedGlobalGroup(
@@ -283,12 +274,12 @@ val ruleSummaryFlow by lazy {
             appIdToAllGroups = appAllGroups.mapValues { e -> e.value.toImmutableList() }
                 .toImmutableMap()
         )
-    }.flowOn(Dispatchers.Default).stateIn(com.sugarscat.jump.appScope, SharingStarted.Eagerly, RuleSummary())
+    }.flowOn(Dispatchers.Default).stateIn(appScope, SharingStarted.Eagerly, RuleSummary())
 }
 
 fun getSubsStatus(ruleSummary: RuleSummary, count: Long): String {
     return if (count > 0) {
-        "${ruleSummary.numText}/${count}触发"
+        "${ruleSummary.numText} / $count " + getString(R.string.trigger)
     } else {
         ruleSummary.numText
     }
@@ -297,15 +288,15 @@ fun getSubsStatus(ruleSummary: RuleSummary, count: Long): String {
 private fun loadSubs(id: Long): RawSubscription {
     val file = subsFolder.resolve("${id}.json")
     if (!file.exists()) {
-        error("订阅文件不存在")
+        error(getString(R.string.subscription_file_not_exist))
     }
     val subscription = try {
         RawSubscription.parse(file.readText(), json5 = false)
     } catch (e: Exception) {
-        throw Exception("订阅文件解析失败", e)
+        throw Exception(getString(R.string.subscription_file_parsing_failed), e)
     }
     if (subscription.id != id) {
-        error("订阅文件id不一致")
+        error(getString(R.string.subscription_file_id_inconsistent))
     }
     return subscription
 }
@@ -327,7 +318,7 @@ private fun refreshRawSubsList(items: List<SubsItem>) {
 
 fun initSubsState() {
     subsItemsFlow.value
-    com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
+    appScope.launchTry(Dispatchers.IO) {
         subsRefreshingFlow.value = true
         updateSubsFileMutex.withLock {
             val items = DbSet.subsItemDao.queryAll()
@@ -366,15 +357,15 @@ private suspend fun updateSubs(subsEntry: SubsEntry): RawSubscription? {
     val text = try {
         client.get(updateUrl).bodyAsText()
     } catch (e: Exception) {
-        throw Exception("请求更新链接失败", e)
+        throw Exception(getString(R.string.request_update_link_failed), e)
     }
     val newSubsRaw = try {
         RawSubscription.parse(text)
     } catch (e: Exception) {
-        throw Exception("解析文本失败", e)
+        throw Exception(getString(R.string.parse_text_failed), e)
     }
     if (newSubsRaw.id != subsItem.id) {
-        error("新id=${newSubsRaw.id}不匹配旧id=${subsItem.id}")
+        error(getString(R.string.id_not_match, newSubsRaw.id, subsItem.id))
     }
     if (subsRaw != null && newSubsRaw.version <= subsRaw.version) {
         LogUtils.d(
@@ -386,7 +377,7 @@ private suspend fun updateSubs(subsEntry: SubsEntry): RawSubscription? {
     return newSubsRaw
 }
 
-fun checkSubsUpdate(showToast: Boolean = false) = com.sugarscat.jump.appScope.launchTry(Dispatchers.IO) {
+fun checkSubsUpdate(showToast: Boolean = false) = appScope.launchTry(Dispatchers.IO) {
     if (updateSubsMutex.isLocked || subsRefreshingFlow.value) {
         return@launchTry
     }
@@ -394,7 +385,7 @@ fun checkSubsUpdate(showToast: Boolean = false) = com.sugarscat.jump.appScope.la
     updateSubsMutex.withLock {
         if (!withContext(Dispatchers.IO) { NetworkUtils.isAvailable() }) {
             if (showToast) {
-                toast("网络不可用")
+                toast(getString(R.string.network_unavailable))
             }
             return@withLock
         }
@@ -430,9 +421,9 @@ fun checkSubsUpdate(showToast: Boolean = false) = com.sugarscat.jump.appScope.la
         }
         if (showToast) {
             if (successNum > 0) {
-                toast("更新 $successNum 条订阅")
+                toast(getString(R.string.update_some_subscriptions_tip, successNum))
             } else {
-                toast("暂无更新")
+                toast(getString(R.string.no_update))
             }
         }
         LogUtils.d("结束检测更新")

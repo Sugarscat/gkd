@@ -10,6 +10,11 @@ import android.content.pm.PackageManager
 import android.os.IBinder
 import android.view.Display
 import com.blankj.utilcode.util.LogUtils
+import com.sugarscat.jump.composition.CanOnDestroy
+import com.sugarscat.jump.data.DeviceInfo
+import com.sugarscat.jump.util.json
+import com.sugarscat.jump.util.map
+import com.sugarscat.jump.util.toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.sugarscat.jump.META
-import com.sugarscat.jump.app
-import com.sugarscat.jump.composition.CanOnDestroy
-import com.sugarscat.jump.data.DeviceInfo
-import com.sugarscat.jump.util.json
-import com.sugarscat.jump.util.map
-import com.sugarscat.jump.util.toast
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
@@ -89,7 +87,7 @@ fun IActivityTaskManager.safeGetTasks(log: Boolean = true): List<ActivityManager
                 getTasksFcType = -1
                 LogUtils.d(DeviceInfo.instance)
                 LogUtils.d(fcs)
-                toast("Shizuku获取方法签名错误")
+                toast("Shizuku 获取方法签名错误")
             }
         }
     }

@@ -32,9 +32,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.db.DbSet
 import com.sugarscat.jump.ui.component.EmptyText
 import com.sugarscat.jump.ui.component.StartEllipsisText
@@ -73,14 +75,14 @@ fun ActivityLogPage() {
                 }
             },
             title = {
-                Text(text = "界面记录")
+                Text(text = getString(R.string.interface_record))
             },
             actions = {
                 if (logCount > 0) {
                     IconButton(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                         mainVm.dialogFlow.waitResult(
-                            title = "删除记录",
-                            text = "确定删除所有界面记录?",
+                            title = getString(R.string.delete_record),
+                            text = getString(R.string.delete_record_tip),
                             error = true,
                         )
                         DbSet.activityLogDao.deleteAll()
@@ -137,7 +139,7 @@ fun ActivityLogPage() {
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (logCount == 0) {
-                    EmptyText(text = "暂无记录")
+                    EmptyText(text = getString(R.string.empty_record))
                 }
             }
         }

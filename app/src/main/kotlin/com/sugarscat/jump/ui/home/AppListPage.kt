@@ -56,11 +56,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.KeyboardUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ramcosta.composedestinations.generated.destinations.AppConfigPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.flow.update
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.ui.component.AppBarTextField
 import com.sugarscat.jump.ui.component.EmptyText
 import com.sugarscat.jump.ui.component.QueryPkgAuthCard
@@ -72,9 +73,10 @@ import com.sugarscat.jump.util.SortTypeOption
 import com.sugarscat.jump.util.ruleSummaryFlow
 import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.throttle
+import kotlinx.coroutines.flow.update
 
 val appListNav = BottomNavItem(
-    label = "应用", icon = Icons.Default.Apps
+    label = getString(R.string.nav_app), icon = Icons.Default.Apps
 )
 
 @Composable
@@ -90,12 +92,6 @@ fun useAppListPage(): ScaffoldExt {
     val orderedAppInfos by vm.appInfosFlow.collectAsState()
     val searchStr by vm.searchStrFlow.collectAsState()
     val ruleSummary by ruleSummaryFlow.collectAsState()
-
-    val globalDesc = if (ruleSummary.globalGroups.isNotEmpty()) {
-        "${ruleSummary.globalGroups.size}全局"
-    } else {
-        null
-    }
 
     var expanded by remember { mutableStateOf(false) }
     var showSearchBar by rememberSaveable {
@@ -144,7 +140,7 @@ fun useAppListPage(): ScaffoldExt {
                     AppBarTextField(
                         value = searchStr,
                         onValueChange = { newValue -> vm.searchStrFlow.value = newValue.trim() },
-                        hint = "请输入应用名称/ID",
+                        hint = getString(R.string.input_app_name_id),
                         modifier = Modifier.focusRequester(focusRequester)
                     )
                 } else {
@@ -192,7 +188,7 @@ fun useAppListPage(): ScaffoldExt {
                             onDismissRequest = { expanded = false }
                         ) {
                             Text(
-                                text = "排序",
+                                text = getString(R.string.sort),
                                 modifier = Modifier.menuPadding(),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
@@ -215,14 +211,14 @@ fun useAppListPage(): ScaffoldExt {
                                 )
                             }
                             Text(
-                                text = "选项",
+                                text = getString(R.string.options),
                                 modifier = Modifier.menuPadding(),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
                             )
                             DropdownMenuItem(
                                 text = {
-                                    Text("显示系统应用")
+                                    Text(getString(R.string.show_system_apps))
                                 },
                                 trailingIcon = {
                                     Checkbox(
@@ -238,7 +234,7 @@ fun useAppListPage(): ScaffoldExt {
                             )
                             DropdownMenuItem(
                                 text = {
-                                    Text("显示隐藏应用")
+                                    Text(getString(R.string.show_hidden_apps))
                                 },
                                 trailingIcon = {
                                     Checkbox(
@@ -265,7 +261,9 @@ fun useAppListPage(): ScaffoldExt {
                 Row(
                     modifier = Modifier
                         .clickable(onClick = throttle {
-                            navController.toDestinationsNavigator().navigate(AppConfigPageDestination(appInfo.id))
+                            navController
+                                .toDestinationsNavigator()
+                                .navigate(AppConfigPageDestination(appInfo.id))
                         })
                         .height(IntrinsicSize.Min)
                         .appItemPadding(),
@@ -320,42 +318,26 @@ fun useAppListPage(): ScaffoldExt {
                         val appGroups = ruleSummary.appIdToAllGroups[appInfo.id] ?: emptyList()
 
                         val appDesc = if (appGroups.isNotEmpty()) {
-                            when (val disabledCount = appGroups.count { g -> !g.enable }) {
-                                0 -> {
-                                    "${appGroups.size}组规则"
-                                }
-
-                                appGroups.size -> {
-                                    "${appGroups.size}组规则/${disabledCount}关闭"
-                                }
-
-                                else -> {
-                                    "${appGroups.size}组规则/${appGroups.size - disabledCount}启用/${disabledCount}关闭"
-                                }
-                            }
+                            val disabledCount = appGroups.count { g -> !g.enable }
+                            getString(
+                                R.string.rule_on_off,
+                                appGroups.size,
+                                appGroups.size - disabledCount,
+                                disabledCount
+                            )
                         } else {
                             null
                         }
 
-                        val desc = if (globalDesc != null) {
-                            if (appDesc != null) {
-                                "$globalDesc/$appDesc"
-                            } else {
-                                globalDesc
-                            }
-                        } else {
-                            appDesc
-                        }
-
-                        if (desc != null) {
+                        if (appDesc != null) {
                             Text(
-                                text = desc,
+                                text = appDesc,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         } else {
                             Text(
-                                text = "暂无规则",
+                                text = getString(R.string.no_rules),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
@@ -366,7 +348,7 @@ fun useAppListPage(): ScaffoldExt {
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (orderedAppInfos.isEmpty() && searchStr.isNotEmpty()) {
-                    EmptyText(text = "暂无搜索结果")
+                    EmptyText(text = getString(R.string.no_search_results))
                 }
                 QueryPkgAuthCard()
             }

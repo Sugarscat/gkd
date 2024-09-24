@@ -3,13 +3,7 @@ package com.sugarscat.jump
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blankj.utilcode.util.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import com.blankj.utilcode.util.StringUtils.getString
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsItem
 import com.sugarscat.jump.db.DbSet
@@ -23,6 +17,13 @@ import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.map
 import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.updateSubscription
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
     val enableDarkThemeFlow = storeFlow.debounce(300).map { s -> s.enableDarkTheme }.stateIn(
@@ -50,7 +51,7 @@ class MainViewModel : ViewModel() {
                 updateSubscription(
                     RawSubscription(
                         id = LOCAL_SUBS_ID,
-                        name = "本地订阅",
+                        name = getString(R.string.local_subscription),
                         version = 0
                     )
                 )

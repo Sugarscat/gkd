@@ -48,13 +48,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AppItemPageDestination
 import com.ramcosta.composedestinations.generated.destinations.GlobalRulePageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.flow.update
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.ExcludeData
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsConfig
@@ -75,6 +76,7 @@ import com.sugarscat.jump.util.RuleSortOption
 import com.sugarscat.jump.util.appInfoCacheFlow
 import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.throttle
+import kotlinx.coroutines.flow.update
 
 @Destination<RootGraph>(style = ProfileTransitions::class)
 @Composable
@@ -134,7 +136,7 @@ fun AppConfigPage(appId: String) {
                         onDismissRequest = { expanded = false }
                     ) {
                         Text(
-                            text = "排序",
+                            text = getString(R.string.sort),
                             modifier = Modifier.menuPadding(),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
@@ -164,7 +166,8 @@ fun AppConfigPage(appId: String) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = throttle {
-                    navController.toDestinationsNavigator().navigate(AppItemPageDestination(LOCAL_SUBS_ID, appId))
+                    navController.toDestinationsNavigator()
+                        .navigate(AppItemPageDestination(LOCAL_SUBS_ID, appId))
                 },
                 content = {
                     Icon(
@@ -254,7 +257,7 @@ fun AppConfigPage(appId: String) {
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (globalGroups.size + appGroups.size == 0) {
-                    EmptyText(text = "暂无规则")
+                    EmptyText(text = getString(R.string.no_rules))
                 } else {
                     // 避免被 floatingActionButton 遮挡
                     Spacer(modifier = Modifier.height(EmptyHeight))
@@ -330,7 +333,7 @@ private fun AppGroupCard(
                     )
                 } else {
                     Text(
-                        text = "暂无描述",
+                        text = getString(R.string.no_desc),
                         modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -338,7 +341,7 @@ private fun AppGroupCard(
                 }
             } else {
                 Text(
-                    text = "非法选择器",
+                    text = getString(R.string.illegal_selector),
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error
@@ -358,8 +361,8 @@ private fun AppGroupCard(
                     indication = null,
                 ) {
                     context.mainVm.dialogFlow.updateDialogOptions(
-                        title = "内置禁用",
-                        text = "此规则组已经在其 apps 字段中配置对当前应用的禁用, 因此无法手动开启规则组\n\n提示: 这种情况一般在此全局规则无法适配/跳过适配/单独适配当前应用时出现",
+                        title = getString(R.string.built_in_disable),
+                        text = getString(R.string.built_in_disable_desc),
                     )
                 }
             )

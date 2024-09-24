@@ -41,18 +41,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AppItemPageDestination
 import com.ramcosta.composedestinations.generated.destinations.GlobalRulePageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.ClickLog
 import com.sugarscat.jump.data.ExcludeData
 import com.sugarscat.jump.data.SubsConfig
@@ -70,6 +66,12 @@ import com.sugarscat.jump.util.launchAsFn
 import com.sugarscat.jump.util.subsIdToRawFlow
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 @Destination<RootGraph>(style = ProfileTransitions::class)
 @Composable
@@ -119,13 +121,13 @@ fun ClickLogPage() {
                     )
                 }
             },
-            title = { Text(text = "触发记录") },
+            title = { Text(text = getString(R.string.triggered_record)) },
             actions = {
                 if (clickLogCount > 0) {
                     IconButton(onClick = throttle(fn = vm.viewModelScope.launchAsFn {
                         mainVm.dialogFlow.waitResult(
-                            title = "删除记录",
-                            text = "确定删除所有触发记录?",
+                            title = getString(R.string.delete_record),
+                            text = getString(R.string.confirm_delete_trigger_records),
                             error = true,
                         )
                         DbSet.clickLogDao.deleteAll()
@@ -195,7 +197,7 @@ fun ClickLogPage() {
             item {
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (clickLogCount == 0) {
-                    EmptyText(text = "暂无记录")
+                    EmptyText(text = getString(R.string.no_record))
                 }
             }
         }
@@ -216,21 +218,25 @@ fun ClickLogPage() {
                 val appInfo = appInfoCache[clickLog.appId]
 
                 Text(
-                    text = "查看规则组", modifier = Modifier
+                    text = getString(R.string.view_rule_group), modifier = Modifier
                         .clickable(onClick = throttle {
                             clickLog.appId ?: return@throttle
                             if (clickLog.groupType == SubsConfig.AppGroupType) {
-                                navController.toDestinationsNavigator().navigate(
-                                    AppItemPageDestination(
-                                        clickLog.subsId, clickLog.appId, clickLog.groupKey
+                                navController
+                                    .toDestinationsNavigator()
+                                    .navigate(
+                                        AppItemPageDestination(
+                                            clickLog.subsId, clickLog.appId, clickLog.groupKey
+                                        )
                                     )
-                                )
                             } else if (clickLog.groupType == SubsConfig.GlobalGroupType) {
-                                navController.toDestinationsNavigator().navigate(
-                                    GlobalRulePageDestination(
-                                        clickLog.subsId, clickLog.groupKey
+                                navController
+                                    .toDestinationsNavigator()
+                                    .navigate(
+                                        GlobalRulePageDestination(
+                                            clickLog.subsId, clickLog.groupKey
+                                        )
                                     )
-                                )
                             }
                             previewClickLog = null
                         })
@@ -252,7 +258,10 @@ fun ClickLogPage() {
                     }
                     if (appChecked != null) {
                         Text(
-                            text = if (appChecked) "在此应用禁用" else "移除在此应用的禁用",
+                            text = if (appChecked)
+                                getString(R.string.disable_in_the_app)
+                            else
+                                getString(R.string.enable_in_the_app),
                             modifier = Modifier
                                 .clickable(
                                     onClick = vm.viewModelScope.launchAsFn(
@@ -274,7 +283,7 @@ fun ClickLogPage() {
                                                 .stringify()
                                         )
                                         DbSet.subsConfigDao.insert(newSubsConfig)
-                                        toast("更新禁用")
+                                        toast(getString(R.string.update_disabled))
                                     })
                                 .fillMaxWidth()
                                 .padding(16.dp),
@@ -285,7 +294,10 @@ fun ClickLogPage() {
                     val disabled =
                         oldExclude.activityIds.contains(clickLog.appId to clickLog.activityId)
                     Text(
-                        text = if (disabled) "移除在此页面的禁用" else "在此页面禁用",
+                        text = if (disabled)
+                            getString(R.string.enable_on_the_page)
+                        else
+                            getString(R.string.disable_on_the_page),
                         modifier = Modifier
                             .clickable(onClick = vm.viewModelScope.launchAsFn(Dispatchers.IO) {
                                 val subsConfig =
@@ -312,7 +324,7 @@ fun ClickLogPage() {
                                         .stringify()
                                 )
                                 DbSet.subsConfigDao.insert(newSubsConfig)
-                                toast("更新禁用")
+                                toast(getString(R.string.update_disabled))
                             })
                             .fillMaxWidth()
                             .padding(16.dp),
@@ -320,12 +332,12 @@ fun ClickLogPage() {
                 }
 
                 Text(
-                    text = "删除记录",
+                    text = getString(R.string.delete_record),
                     modifier = Modifier
                         .clickable(onClick = vm.viewModelScope.launchAsFn {
                             previewClickLog = null
                             DbSet.clickLogDao.delete(clickLog)
-                            toast("删除成功")
+                            toast(getString(R.string.delete_success))
                         })
                         .fillMaxWidth()
                         .padding(16.dp),

@@ -5,14 +5,9 @@ import androidx.core.graphics.set
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.blankj.utilcode.util.ZipUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.serialization.encodeToString
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.ComplexSnapshot
 import com.sugarscat.jump.data.RpcError
 import com.sugarscat.jump.data.createComplexSnapshot
@@ -25,6 +20,13 @@ import com.sugarscat.jump.util.snapshotFolder
 import com.sugarscat.jump.util.snapshotZipDir
 import com.sugarscat.jump.util.storeFlow
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.encodeToString
 import java.io.File
 import kotlin.math.min
 
@@ -83,14 +85,14 @@ object SnapshotExt {
 
     suspend fun captureSnapshot(skipScreenshot: Boolean = false): ComplexSnapshot {
         if (!JumpAbService.isRunning.value) {
-            throw RpcError("无障碍不可用")
+            throw RpcError(getString(R.string.accessibility_is_not_available))
         }
         if (captureLoading.value) {
-            throw RpcError("正在保存快照,不可重复操作")
+            throw RpcError(getString(R.string.do_not_repeat_the_operation))
         }
         captureLoading.value = true
         if (storeFlow.value.showSaveSnapshotToast) {
-            toast("正在保存快照...")
+            toast(getString(R.string.saving_snapshot))
         }
 
         try {
@@ -141,7 +143,7 @@ object SnapshotExt {
                 File(getSnapshotPath(snapshot.id)).writeText(text)
                 DbSet.snapshotDao.insert(snapshot.toSnapshot())
             }
-            toast("快照捕获成功")
+            toast(getString(R.string.snapshot_was_captured_successfully))
             return snapshot
         } finally {
             captureLoading.value = false

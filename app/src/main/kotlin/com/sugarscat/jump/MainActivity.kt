@@ -24,14 +24,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ServiceUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.dylanc.activityresult.launcher.PickContentLauncher
 import com.dylanc.activityresult.launcher.StartActivityLauncher
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import com.sugarscat.jump.debug.FloatingService
 import com.sugarscat.jump.debug.HttpService
 import com.sugarscat.jump.debug.ScreenshotService
@@ -52,6 +49,10 @@ import com.sugarscat.jump.util.map
 import com.sugarscat.jump.util.openApp
 import com.sugarscat.jump.util.openUri
 import com.sugarscat.jump.util.storeFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     val mainVm by viewModels<MainViewModel>()
@@ -202,13 +203,13 @@ private fun ShizukuErrorDialog(stateFlow: MutableStateFlow<Boolean>) {
         val installed = appInfoCache.value.contains(appId)
         AlertDialog(
             onDismissRequest = { stateFlow.value = false },
-            title = { Text(text = "授权错误") },
+            title = { Text(text = getString(R.string.authorization_error)) },
             text = {
                 Text(
                     text = if (installed) {
-                        "Shizuku 授权失败, 请检查是否运行"
+                        getString(R.string.is_shizuku_running)
                     } else {
-                        "Shizuku 未安装, 请先下载后安装"
+                        getString(R.string.shizuku_not_installed)
                     }
                 )
             },
@@ -218,20 +219,20 @@ private fun ShizukuErrorDialog(stateFlow: MutableStateFlow<Boolean>) {
                         stateFlow.value = false
                         app.openApp(appId)
                     }) {
-                        Text(text = "打开 Shizuku")
+                        Text(text = getString(R.string.open_shizuku))
                     }
                 } else {
                     TextButton(onClick = {
                         stateFlow.value = false
                         app.openUri("https://shizuku.rikka.app/")
                     }) {
-                        Text(text = "去下载")
+                        Text(text = getString(R.string.go_to_download))
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { stateFlow.value = false }) {
-                    Text(text = "我知道了")
+                    Text(text = getString(R.string.i_see))
                 }
             }
         )

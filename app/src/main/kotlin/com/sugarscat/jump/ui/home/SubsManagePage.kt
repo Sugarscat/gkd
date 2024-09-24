@@ -55,12 +55,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blankj.utilcode.util.StringUtils.getString
 import com.dylanc.activityresult.launcher.launchForResult
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.Value
 import com.sugarscat.jump.data.deleteSubscription
 import com.sugarscat.jump.data.exportData
@@ -86,11 +84,16 @@ import com.sugarscat.jump.util.subsItemsFlow
 import com.sugarscat.jump.util.subsRefreshingFlow
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 val subsNav = BottomNavItem(
-    label = "订阅", icon = Icons.AutoMirrored.Filled.FormatListBulleted
+    label = getString(R.string.nav_subscription),
+    icon = Icons.AutoMirrored.Filled.FormatListBulleted
 )
 
 @Composable
@@ -133,12 +136,12 @@ fun useSubsManagePage(): ScaffoldExt {
     if (showSettingsDlg) {
         AlertDialog(
             onDismissRequest = { showSettingsDlg = false },
-            title = { Text("订阅设置") },
+            title = { Text(getString(R.string.subscription_settings)) },
             text = {
                 val store by storeFlow.collectAsState()
                 TextMenu(
                     modifier = Modifier.padding(0.dp, itemVerticalPadding),
-                    title = "更新订阅",
+                    title = getString(R.string.update_subscription),
                     option = UpdateTimeOption.allSubObject.findOption(store.updateSubsInterval)
                 ) {
                     storeFlow.update { s -> s.copy(updateSubsInterval = it.value) }
@@ -146,7 +149,7 @@ fun useSubsManagePage(): ScaffoldExt {
             },
             confirmButton = {
                 TextButton(onClick = { showSettingsDlg = false }) {
-                    Text("关闭")
+                    Text(getString(R.string.close))
                 }
             }
         )
@@ -188,12 +191,17 @@ fun useSubsManagePage(): ScaffoldExt {
                         selectedIds
                     }
                     if (canDeleteIds.isNotEmpty()) {
-                        val text = "确定删除所选 ${canDeleteIds.size} 个订阅?".let {
-                            if (selectedIds.contains(LOCAL_SUBS_ID)) "$it\n\n注: 不包含本地订阅" else it
+                        val text = getString(
+                            R.string.delete_multiple_subscriptions_tip,
+                            canDeleteIds.size
+                        ).let {
+                            if (selectedIds.contains(LOCAL_SUBS_ID))
+                                "$it\n" + getString(R.string.not_include_local_subscriptions)
+                            else it
                         }
                         IconButton(onClick = vm.viewModelScope.launchAsFn {
                             context.mainVm.dialogFlow.waitResult(
-                                title = "删除订阅",
+                                title = getString(R.string.delete_subscription),
                                 text = text,
                                 error = true,
                             )
@@ -228,9 +236,9 @@ fun useSubsManagePage(): ScaffoldExt {
                 } else {
                     IconButton(onClick = throttle {
                         if (storeFlow.value.enableMatch) {
-                            toast("暂停规则匹配")
+                            toast(getString(R.string.pause_rule_matching))
                         } else {
-                            toast("开启规则匹配")
+                            toast(getString(R.string.enable_rule_matching))
                         }
                         storeFlow.update { s -> s.copy(enableMatch = !s.enableMatch) }
                     }) {
@@ -254,7 +262,7 @@ fun useSubsManagePage(): ScaffoldExt {
                     }
                     IconButton(onClick = {
                         if (subsRefreshingFlow.value) {
-                            toast("正在刷新订阅,请稍后操作")
+                            toast(getString(R.string.refreshing))
                         } else {
                             expanded = true
                         }
@@ -272,7 +280,7 @@ fun useSubsManagePage(): ScaffoldExt {
                         if (isSelectedMode) {
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "全选")
+                                    Text(text = getString(R.string.select_all))
                                 },
                                 onClick = {
                                     expanded = false
@@ -281,7 +289,7 @@ fun useSubsManagePage(): ScaffoldExt {
                             )
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = "反选")
+                                    Text(text = getString(R.string.counter_election))
                                 },
                                 onClick = {
                                     expanded = false
@@ -302,7 +310,7 @@ fun useSubsManagePage(): ScaffoldExt {
                                     )
                                 },
                                 text = {
-                                    Text(text = "导入数据")
+                                    Text(text = getString(R.string.import_data))
                                 },
                                 onClick = vm.viewModelScope.launchAsFn(Dispatchers.IO) {
                                     expanded = false
@@ -313,7 +321,7 @@ fun useSubsManagePage(): ScaffoldExt {
                                         })
                                     val uri = result.data?.data
                                     if (uri == null) {
-                                        toast("未选择文件")
+                                        toast(getString(R.string.no_file_selected))
                                         return@launchAsFn
                                     }
                                     importData(uri)
@@ -328,7 +336,7 @@ fun useSubsManagePage(): ScaffoldExt {
             if (!isSelectedMode) {
                 FloatingActionButton(onClick = {
                     if (subsRefreshingFlow.value) {
-                        toast("正在刷新订阅,请稍后操作")
+                        toast(getString(R.string.refreshing))
                         return@FloatingActionButton
                     }
                     vm.viewModelScope.launchTry {
@@ -459,18 +467,18 @@ private fun ShareDataDialog(vm: HomeVm) {
                     .fillMaxWidth()
                     .padding(16.dp)
                 Text(
-                    text = "分享到其他应用", modifier = Modifier
+                    text = getString(R.string.share_to_other_apps), modifier = Modifier
                         .clickable(onClick = throttle {
                             vm.showShareDataIdsFlow.value = null
                             vm.viewModelScope.launchTry(Dispatchers.IO) {
                                 val file = exportData(showShareDataIds)
-                                context.shareFile(file, "分享数据文件")
+                                context.shareFile(file, getString(R.string.share_data_files))
                             }
                         })
                         .then(modifier)
                 )
                 Text(
-                    text = "保存到下载",
+                    text = getString(R.string.save_to_downloads),
                     modifier = Modifier
                         .clickable(onClick = throttle {
                             vm.showShareDataIdsFlow.value = null

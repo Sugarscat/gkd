@@ -58,9 +58,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blankj.utilcode.util.StringUtils.getString
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.AppInfo
 import com.sugarscat.jump.data.ExcludeData
 import com.sugarscat.jump.data.RawSubscription
@@ -128,7 +130,7 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
                 AppBarTextField(
                     value = searchStr,
                     onValueChange = { newValue -> vm.searchStrFlow.value = newValue.trim() },
-                    hint = "请输入应用名称/ID",
+                    hint = getString(R.string.input_app_name_id),
                     modifier = Modifier.focusRequester(focusRequester)
                 )
             } else {
@@ -177,7 +179,7 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
                         onDismissRequest = { expanded = false }
                     ) {
                         Text(
-                            text = "排序",
+                            text = getString(R.string.sort),
                             modifier = Modifier.menuPadding(),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
@@ -200,14 +202,14 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
                             )
                         }
                         Text(
-                            text = "选项",
+                            text = getString(R.string.options),
                             modifier = Modifier.menuPadding(),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                         )
                         DropdownMenuItem(
                             text = {
-                                Text("显示系统应用")
+                                Text(getString(R.string.show_system_apps))
                             },
                             trailingIcon = {
                                 Checkbox(
@@ -222,7 +224,7 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
                         )
                         DropdownMenuItem(
                             text = {
-                                Text("显示隐藏应用")
+                                Text(getString(R.string.show_hidden_apps))
                             },
                             trailingIcon = {
                                 Checkbox(
@@ -350,7 +352,7 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        EmptyText(text = "暂无搜索结果")
+                        EmptyText(text = getString(R.string.no_search_results))
                         Spacer(modifier = Modifier.height(EmptyHeight))
                     }
                 }
@@ -367,7 +369,7 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
         }
         val oldSource = remember { source }
         AlertDialog(
-            title = { Text(text = "编辑禁用") },
+            title = { Text(text = getString(R.string.edit_disabled)) },
             text = {
                 OutlinedTextField(
                     value = source,
@@ -377,7 +379,7 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
                         .focusRequester(focusRequester),
                     placeholder = {
                         Text(
-                            text = tipText,
+                            text = getString(R.string.edit_disabled_placeholder),
                             style = LocalTextStyle.current.copy(fontSize = MaterialTheme.typography.bodySmall.fontSize)
                         )
                     },
@@ -395,13 +397,13 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
             },
             dismissButton = {
                 TextButton(onClick = { showEditDlg = false }) {
-                    Text(text = "取消")
+                    Text(text = getString(R.string.cancel))
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     if (oldSource == source) {
-                        toast("禁用项无变动")
+                        toast(getString(R.string.prohibited_items_no_change))
                         showEditDlg = false
                         return@TextButton
                     }
@@ -417,7 +419,7 @@ fun GlobalRuleExcludePage(subsItemId: Long, groupKey: Int) {
                         DbSet.subsConfigDao.insert(subsConfig)
                     }
                 }) {
-                    Text(text = "更新")
+                    Text(text = getString(R.string.confirm))
                 }
             },
         )
@@ -448,13 +450,3 @@ fun getChecked(
     }
     return group.matchAnyApp ?: true
 }
-
-private val tipText = """
-以换行或英文逗号分割每条禁用
-示例1-禁用单个页面
-appId/activityId
-示例2-禁用整个应用(移除/)
-appId
-示例3-开启此应用(前置!)
-!appId
-""".trimIndent()

@@ -47,11 +47,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AppItemPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
 import com.sugarscat.jump.MainActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsConfig
 import com.sugarscat.jump.db.DbSet
@@ -147,13 +149,13 @@ fun SubsPage(
                     AppBarTextField(
                         value = searchStr,
                         onValueChange = { newValue -> vm.searchStrFlow.value = newValue.trim() },
-                        hint = "请输入应用名称/ID",
+                        hint = getString(R.string.input_app_name_id),
                         modifier = Modifier.focusRequester(focusRequester)
                     )
                 } else {
                     TowLineText(
                         title = subsRaw?.name ?: subsItemId.toString(),
-                        subTitle = "应用规则",
+                        subTitle = getString(R.string.app_rules),
                     )
                 }
             }, actions = {
@@ -183,7 +185,7 @@ fun SubsPage(
                     ) {
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             Text(
-                                text = "排序",
+                                text = getString(R.string.sort),
                                 modifier = Modifier.menuPadding(),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
@@ -206,14 +208,14 @@ fun SubsPage(
                                 )
                             }
                             Text(
-                                text = "选项",
+                                text = getString(R.string.options),
                                 modifier = Modifier.menuPadding(),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
                             )
                             DropdownMenuItem(
                                 text = {
-                                    Text("显示未安装应用")
+                                    Text(getString(R.string.show_uninstalled_apps))
                                 },
                                 trailingIcon = {
                                     Checkbox(checked = showUninstallApp, onCheckedChange = {
@@ -252,7 +254,8 @@ fun SubsPage(
                     subsConfig = subsConfig,
                     enableSize = enableSize,
                     onClick = throttle {
-                        navController.toDestinationsNavigator().navigate(AppItemPageDestination(subsItemId, appRaw.id))
+                        navController.toDestinationsNavigator()
+                            .navigate(AppItemPageDestination(subsItemId, appRaw.id))
                     },
                     onValueChange = throttle(fn = vm.viewModelScope.launchAsFn { enable ->
                         val newItem = subsConfig?.copy(
@@ -268,15 +271,18 @@ fun SubsPage(
                     showMenu = editable,
                     onDelClick = throttle(fn = vm.viewModelScope.launchAsFn {
                         context.mainVm.dialogFlow.waitResult(
-                            title = "删除规则组",
-                            text = "确定删除 ${appInfoCache[appRaw.id]?.name ?: appRaw.name ?: appRaw.id} 下所有规则组?",
+                            title = getString(R.string.delete_rule_group),
+                            text = getString(
+                                R.string.delete_rules_under_the_group_tip,
+                                appInfoCache[appRaw.id]?.name ?: appRaw.name ?: appRaw.id
+                            ),
                             error = true,
                         )
                         if (subsRaw != null && subsItem != null) {
                             updateSubscription(subsRaw.copy(apps = subsRaw.apps.filter { a -> a.id != appRaw.id }))
                             DbSet.subsItemDao.update(subsItem.copy(mtime = System.currentTimeMillis()))
                             DbSet.subsConfigDao.delete(subsItem.id, appRaw.id)
-                            toast("删除成功")
+                            toast(getString(R.string.delete_success))
                         }
                     })
                 )
@@ -285,7 +291,8 @@ fun SubsPage(
                 Spacer(modifier = Modifier.height(EmptyHeight))
                 if (appAndConfigs.isEmpty()) {
                     EmptyText(
-                        text = if (searchStr.isNotEmpty()) "暂无搜索结果" else "暂无规则",
+                        text = if (searchStr.isNotEmpty()) getString(R.string.no_search_results)
+                        else getString(R.string.no_rules),
                     )
                 } else if (editable) {
                     Spacer(modifier = Modifier.height(EmptyHeight))
@@ -300,13 +307,13 @@ fun SubsPage(
         var source by remember {
             mutableStateOf("")
         }
-        AlertDialog(title = { Text(text = "添加应用规则") }, text = {
+        AlertDialog(title = { Text(text = getString(R.string.add_app_rules)) }, text = {
             OutlinedTextField(
                 value = source,
                 onValueChange = { source = it },
                 maxLines = 10,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = "请输入规则\n若应用规则已经存在则追加") },
+                placeholder = { Text(text = getString(R.string.add_app_rules_tip)) },
             )
         }, onDismissRequest = {
             if (source.isEmpty()) {
@@ -318,15 +325,15 @@ fun SubsPage(
                     RawSubscription.parseRawApp(source)
                 } catch (e: Exception) {
                     LogUtils.d(e)
-                    toast("非法规则${e.message}")
+                    toast(getString(R.string.illegal_rule_tip, e.message))
                     return@TextButton
                 }
                 if (newAppRaw.groups.isEmpty()) {
-                    toast("不允许添加空规则组")
+                    toast(getString(R.string.cannot_add_empty_rule_group))
                     return@TextButton
                 }
                 if (newAppRaw.groups.any { s -> s.name.isBlank() }) {
-                    toast("不允许添加空白名规则组,请先命名")
+                    toast(getString(R.string.rule_group_name_is_blank))
                     return@TextButton
                 }
                 val oldAppRawIndex = subsRaw.apps.indexOfFirst { a -> a.id == newAppRaw.id }
@@ -335,7 +342,7 @@ fun SubsPage(
                     // check same group name
                     newAppRaw.groups.forEach { g ->
                         if (oldAppRaw.groups.any { g0 -> g0.name == g.name }) {
-                            toast("已经存在同名规则[${g.name}]\n请修改名称后再添加")
+                            toast(getString(R.string.has_same_rule_name, g.name))
                             return@TextButton
                         }
                     }
@@ -373,14 +380,14 @@ fun SubsPage(
                     )
                     DbSet.subsItemDao.update(subsItem.copy(mtime = System.currentTimeMillis()))
                     showAddDlg = false
-                    toast("添加成功")
+                    toast(getString(R.string.add_success))
                 }
             }, enabled = source.isNotEmpty()) {
-                Text(text = "添加")
+                Text(text = getString(R.string.add))
             }
         }, dismissButton = {
             TextButton(onClick = { showAddDlg = false }) {
-                Text(text = "取消")
+                Text(text = getString(R.string.cancel))
             }
         })
     }

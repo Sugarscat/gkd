@@ -15,19 +15,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.AdvancedPageDestination
 import com.ramcosta.composedestinations.utils.toDestinationsNavigator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import com.sugarscat.jump.MainActivity
 import com.sugarscat.jump.OpenFileActivity
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.importData
 import com.sugarscat.jump.util.LocalNavController
 import com.sugarscat.jump.util.ProfileTransitions
 import com.sugarscat.jump.util.launchTry
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 
 data class BottomNavItem(
     val label: String,
@@ -59,7 +61,7 @@ fun HomePage() {
         val source = intent.getStringExtra("source")
         if (source == OpenFileActivity::class.qualifiedName) {
             vm.viewModelScope.launchTry(Dispatchers.IO) {
-                toast("加载导入...")
+                toast(getString(R.string.loading_import))
                 vm.tabFlow.value = subsPage.navItem
                 importData(uri)
             }

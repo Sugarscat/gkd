@@ -12,14 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.blankj.utilcode.util.StringUtils.getString
 import com.sugarscat.jump.MainActivity
 import com.sugarscat.jump.MainViewModel
+import com.sugarscat.jump.R
 import com.sugarscat.jump.util.isSafeUrl
 import com.sugarscat.jump.util.launchAsFn
 import com.sugarscat.jump.util.subsItemsFlow
 import com.sugarscat.jump.util.throttle
 import com.sugarscat.jump.util.toast
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -42,23 +44,23 @@ class InputSubsLinkOption {
     private suspend fun submit(mainVm: MainViewModel) {
         val value = valueFlow.value
         if (!URLUtil.isNetworkUrl(value)) {
-            toast("非法链接")
+            toast(getString(R.string.illegal_link))
             return
         }
         val initValue = initValueFlow.value
         if (initValue.isNotEmpty() && initValue == value) {
-            toast("未修改")
+            toast(getString(R.string.unmodified))
             resume(null)
             return
         }
         if (subsItemsFlow.value.any { it.updateUrl == value }) {
-            toast("已有相同链接订阅")
+            toast(getString(R.string.same_link))
             return
         }
         if (!isSafeUrl(value)) {
             mainVm.dialogFlow.waitResult(
-                title = "未知来源",
-                text = "你正在添加一个未验证的远程订阅\n\n这可能含有恶意的规则\n\n是否仍然确认添加?"
+                title = getString(R.string.unknown_source),
+                text = getString(R.string.unknown_source_tip)
             )
         }
         resume(value)
@@ -84,7 +86,13 @@ class InputSubsLinkOption {
             val initValue by initValueFlow.collectAsState()
             AlertDialog(
                 title = {
-                    Text(text = if (initValue.isNotEmpty()) "修改订阅" else "添加订阅")
+                    Text(
+                        text =
+                        if (initValue.isNotEmpty())
+                            getString(R.string.modify_subscription)
+                        else
+                            getString(R.string.add_subscription)
+                    )
                 },
                 text = {
                     OutlinedTextField(
@@ -95,7 +103,7 @@ class InputSubsLinkOption {
                         maxLines = 8,
                         modifier = Modifier.fillMaxWidth(),
                         placeholder = {
-                            Text(text = "请输入订阅链接")
+                            Text(text = getString(R.string.input_subscription_link))
                         },
                         isError = value.isNotEmpty() && !URLUtil.isNetworkUrl(value),
                     )
@@ -112,12 +120,12 @@ class InputSubsLinkOption {
                             submit(context.mainVm)
                         }),
                     ) {
-                        Text(text = "确定")
+                        Text(text = getString(R.string.confirm))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = ::cancel) {
-                        Text(text = "取消")
+                        Text(text = getString(R.string.cancel))
                     }
                 },
             )

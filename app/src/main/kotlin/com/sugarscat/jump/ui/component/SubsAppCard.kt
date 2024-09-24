@@ -36,14 +36,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.blankj.utilcode.util.ClipboardUtils
+import com.blankj.utilcode.util.StringUtils.getString
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.sugarscat.jump.R
 import com.sugarscat.jump.data.AppInfo
 import com.sugarscat.jump.data.RawSubscription
 import com.sugarscat.jump.data.SubsConfig
 import com.sugarscat.jump.ui.style.appItemPadding
-import li.songe.json5.encodeToJson5String
 import com.sugarscat.jump.util.json
 import com.sugarscat.jump.util.toast
+import li.songe.json5.encodeToJson5String
 
 
 @Composable
@@ -118,11 +120,12 @@ fun SubsAppCard(
             )
 
             if (rawApp.groups.isNotEmpty()) {
-                val enableDesc = when (enableSize) {
-                    0 -> "${rawApp.groups.size}组规则/${rawApp.groups.size}关闭"
-                    rawApp.groups.size -> "${rawApp.groups.size}组规则"
-                    else -> "${rawApp.groups.size}组规则/${enableSize}启用/${rawApp.groups.size - enableSize}关闭"
-                }
+                val enableDesc = getString(
+                    R.string.rule_on_off,
+                    rawApp.groups.size,
+                    enableSize,
+                    rawApp.groups.size - enableSize
+                )
                 Text(
                     text = enableDesc,
                     maxLines = 1,
@@ -134,7 +137,7 @@ fun SubsAppCard(
                 )
             } else {
                 Text(
-                    text = "暂无规则",
+                    text = getString(R.string.no_rules),
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
@@ -162,19 +165,22 @@ fun SubsAppCard(
                 ) {
                     DropdownMenuItem(
                         text = {
-                            Text(text = "复制")
+                            Text(text = getString(R.string.copy))
                         },
                         onClick = {
                             ClipboardUtils.copyText(
                                 json.encodeToJson5String(rawApp)
                             )
-                            toast("复制成功")
+                            toast(getString(R.string.copied))
                             expanded = false
                         },
                     )
                     DropdownMenuItem(
                         text = {
-                            Text(text = "删除", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                text = getString(R.string.delete),
+                                color = MaterialTheme.colorScheme.error
+                            )
                         },
                         onClick = {
                             onDelClick?.invoke()

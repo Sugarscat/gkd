@@ -8,7 +8,7 @@ object DbSet {
 
     private fun buildDb(): AppDb {
         return Room.databaseBuilder(
-            com.sugarscat.jump.app, AppDb::class.java, dbFolder.resolve("gkd.db").absolutePath
+            app, AppDb::class.java, dbFolder.resolve("jump.db").absolutePath
         ).fallbackToDestructiveMigration().build()
     }
 
