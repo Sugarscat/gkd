@@ -381,4 +381,5 @@
     <string name="delete_record_tip" />
     <string name="shizuku_authorization_desc" />
     <string name="shizuku_authorization_failed" />
+    <string name="global_app_rule_trigger" />
 </resources>

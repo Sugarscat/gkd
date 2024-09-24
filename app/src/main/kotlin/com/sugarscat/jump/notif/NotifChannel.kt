@@ -22,7 +22,7 @@ val floatingChannel by lazy {
     NotifChannel(
         id = "floating",
         name = getString(R.string.floating_service),
-        desc = getString(R.string.dropzone_service_desc)
+        desc = getString(R.string.floating_service_desc)
     )
 }
 val screenshotChannel by lazy {
